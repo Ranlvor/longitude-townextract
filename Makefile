@@ -6,19 +6,22 @@ CC = g++
 LD = g++
 CCargs = -g -c -Wall -I$(OSMBINARYINC)
 LDargs = -Wall
-LDlibs = -pthread -lz -lprotobuf
+LDlibs = -pthread -lz -lprotobuf -lsqlite3
 PROTOC = protoc
 
 all: bin/longitude-townextract
 
-bin/longitude-townextract: bin/main.o bin/InformationExtractor.o bin/osmformat.pb.o bin/fileformat.pb.o
-	$(LD) $(LDargs) -o bin/longitude-townextract bin/main.o bin/InformationExtractor.o bin/osmformat.pb.o bin/fileformat.pb.o $(LDlibs)
+bin/longitude-townextract: bin/main.o bin/InformationExtractor.o bin/Database.o bin/osmformat.pb.o bin/fileformat.pb.o
+	$(LD) $(LDargs) -o bin/longitude-townextract bin/main.o bin/InformationExtractor.o bin/Database.o bin/osmformat.pb.o bin/fileformat.pb.o $(LDlibs)
 
-bin/main.o: src/main.cpp src/InformationExtractor.h generated/osmformat.pb.cc generated/fileformat.pb.cc
+bin/main.o: src/main.cpp src/InformationExtractor.h src/Database.h generated/osmformat.pb.cc generated/fileformat.pb.cc
 	$(CC) $(CCargs) -o bin/main.o src/main.cpp
 
-bin/InformationExtractor.o: src/InformationExtractor.cpp src/InformationExtractor.h generated/osmformat.pb.cc generated/fileformat.pb.cc src/output.h
+bin/InformationExtractor.o: src/InformationExtractor.cpp src/InformationExtractor.h src/Database.h generated/osmformat.pb.cc generated/fileformat.pb.cc src/output.h
 	$(CC) $(CCargs) -o bin/InformationExtractor.o src/InformationExtractor.cpp
+
+bin/Database.o: src/Database.cpp src/Database.h 
+	$(CC) $(CCargs) -o bin/Database.o src/Database.cpp
 
 generated/osmformat.pb.cc: $(OSMBINARYSRC)/osmformat.proto
 	$(PROTOC) --cpp_out=generated -I$(OSMBINARYSRC) $(OSMBINARYSRC)/osmformat.proto

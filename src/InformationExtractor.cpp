@@ -1,7 +1,17 @@
 #include "InformationExtractor.h"
 #include "output.h"
+#include <string>
+#include <sstream>
 InformationExtractor::InformationExtractor()
 {
+}
+
+template <typename T>
+T StringToNumber ( const std::string &Text )//Text not by const reference so that the function can be used with a
+{                               //character array as argument
+    std::stringstream ss(Text);
+    T result;
+    return ss >> result ? result : 0;
 }
 
 void inline InformationExtractor::primBlockCallbackPass1(OSMPBF::PrimitiveBlock primblock){
@@ -52,20 +62,20 @@ void inline InformationExtractor::primBlockCallbackPass1(OSMPBF::PrimitiveBlock 
 
                 if(hasAdminLevel && hasBoundaryAdministrative){
                     std::string name;
-                    std::string adminlevelstr;
+                    int adminlevel;
                     long long int id = r.id();
                     for(int k = 0, n = r.keys_size(); k < n; k++) {
                         if (r.keys(k) == adminLevelNumber){
-                            adminlevelstr = stringtable.s(r.vals(k));
+                            adminlevel = StringToNumber<int>( stringtable.s( r.vals(k) ) );
                         } else if (r.keys(k) == nameNumber){
                             name = stringtable.s(r.vals(k));
                         }
                     }
 
-                    debug("    found border (level %s, id %d) %s", adminlevelstr.c_str(), id, name.c_str());
+                    debug("    found border (level %d, id %d) %s", adminlevel, id, name.c_str());
+                    db.insertBorderRelation(id, name, adminlevel);
                 }
             }
-            //for(int j = 0; )
         }
     }
 }
@@ -81,10 +91,13 @@ void inline InformationExtractor::primBlockCallbackPass3(OSMPBF::PrimitiveBlock 
 void InformationExtractor::init(){
     debug("InformationExtractor::init prepare for pass 1");
     pass = 1;
+    db.beginTransaction();
 }
 
 void InformationExtractor::nextPass(){
+    db.commitTransaction();
     pass++;
+    db.beginTransaction();
     info("\n\nSwitching to pass %d", pass);
 }
 
@@ -106,5 +119,5 @@ void InformationExtractor::primBlockCallback(OSMPBF::PrimitiveBlock primblock){
 }
 
 void InformationExtractor::finish(){
-
+    db.commitTransaction();
 }

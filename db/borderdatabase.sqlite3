@@ -1,0 +1,13 @@
+PRAGMA foreign_keys=OFF;
+BEGIN TRANSACTION;
+CREATE TABLE "borderrelations" (
+    "relationid" INTEGER PRIMARY KEY,
+    "name" TEXT,
+    "adminlevel" INTEGER
+);
+CREATE TABLE "relationway" (
+    "relation" INTEGER,
+    "way" INTEGER
+);
+CREATE UNIQUE INDEX "relationwayunique" on relationway (relation ASC, way ASC);
+COMMIT;

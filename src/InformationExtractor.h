@@ -1,6 +1,7 @@
 #ifndef INFORMATIONEXTRACTOR_H
 #define INFORMATIONEXTRACTOR_H
 #include <osmpbf/osmpbf.h>
+#include "Database.h"
 
 class InformationExtractor
 {
@@ -14,6 +15,7 @@ public:
 
 private:
     int pass;
+    Database db;
     void primBlockCallbackPass1(OSMPBF::PrimitiveBlock primblock);
     void primBlockCallbackPass2(OSMPBF::PrimitiveBlock primblock);
     void primBlockCallbackPass3(OSMPBF::PrimitiveBlock primblock);
