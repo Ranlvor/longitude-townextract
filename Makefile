@@ -6,7 +6,7 @@ CC = g++
 LD = g++
 CCargs = -g -c -Wall -I$(OSMBINARYINC)
 LDargs = -Wall 
-LDlibs = -lprotobuf
+LDlibs = -pthread -lz -lprotobuf
 PROTOC = protoc
 
 all: bin/longitude-townextract
