@@ -1,3 +1,8 @@
 *.kate-swp
 bin
 generated
+longitude-townextract.config
+longitude-townextract.creator
+longitude-townextract.creator.user
+longitude-townextract.files
+longitude-townextract.includes
