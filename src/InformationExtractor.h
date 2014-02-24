@@ -2,7 +2,7 @@
 #define INFORMATIONEXTRACTOR_H
 #include <osmpbf/osmpbf.h>
 #include "Database.h"
-
+#include <unordered_set>
 class InformationExtractor
 {
 public:
@@ -16,6 +16,7 @@ public:
 private:
     int pass;
     Database db;
+    std::unordered_set<long long int> interestingWays;
     void primBlockCallbackPass1(OSMPBF::PrimitiveBlock primblock);
     void primBlockCallbackPass2(OSMPBF::PrimitiveBlock primblock);
     void primBlockCallbackPass3(OSMPBF::PrimitiveBlock primblock);

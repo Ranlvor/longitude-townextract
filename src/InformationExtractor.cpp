@@ -110,6 +110,7 @@ void inline InformationExtractor::primBlockCallbackPass1(OSMPBF::PrimitiveBlock 
                                 warn("      found way (%d) of unknown role (%s)", memid, stringtable.s(roleStringId).c_str());
                             } else {
                                 db.insertRelationWay(id, memid, role);
+                                interestingWays.insert(memid);
                             }
                         }
                     }
@@ -120,7 +121,25 @@ void inline InformationExtractor::primBlockCallbackPass1(OSMPBF::PrimitiveBlock 
 }
 
 void inline InformationExtractor::primBlockCallbackPass2(OSMPBF::PrimitiveBlock primblock){
+    for(int i = 0, l = primblock.primitivegroup_size(); i < l; i++) {
+        OSMPBF::PrimitiveGroup pg = primblock.primitivegroup(i);
+        if(pg.ways_size() > 0) {
+            for(int j = 0, l = pg.ways_size(); j < l; j++) {
+                OSMPBF::Way way = pg.ways(j);
+                long long int wayid = way.id();
+                if(interestingWays.count(wayid) != 0) {
+                    debug("  found way %d", wayid);
+                    //   repeated sint64 refs = 8 [packed = true];  // DELTA coded
 
+                    long long int pointid = 0;
+                    for(int k = 0, l = way.refs_size(); k < l; k++) {
+                        pointid += way.refs(k);
+                        db.insertWayPoint(wayid, pointid);
+                    }
+                }
+            }
+        }
+    }
 }
 
 void inline InformationExtractor::primBlockCallbackPass3(OSMPBF::PrimitiveBlock primblock){
@@ -134,10 +153,10 @@ void InformationExtractor::init(){
 }
 
 void InformationExtractor::nextPass(){
-    db.commitTransaction();
     pass++;
-    db.beginTransaction();
     info("\n\nSwitching to pass %d", pass);
+    db.commitTransaction();
+    db.beginTransaction();
 }
 
 void InformationExtractor::primBlockCallback(OSMPBF::PrimitiveBlock primblock){

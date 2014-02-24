@@ -4,8 +4,8 @@ OSMBINARYSRC = OSM-binary/src
 OSMBINARYINC = OSM-binary/include
 CC = g++
 LD = g++
-CCargs = -g -c -Wall -I$(OSMBINARYINC)
-LDargs = -Wall
+CCargs = -g -c -Wall -I$(OSMBINARYINC) -std=c++11
+LDargs = -Wall  -std=c++11
 LDlibs = -pthread -lz -lprotobuf -lsqlite3
 PROTOC = protoc
 

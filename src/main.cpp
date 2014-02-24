@@ -127,9 +127,9 @@ int main(int argc, char *argv[]) {
     ie.init();
     iterate(argc, argv);
     ie.nextPass();
-    /*iterate(argc, argv);
-    ie.nextPass();
     iterate(argc, argv);
+    ie.nextPass();
+    /*iterate(argc, argv);
     ie.finish();*/
 
     // clean up the protobuf lib

@@ -5,9 +5,18 @@ CREATE TABLE "borderrelations" (
     "name" TEXT,
     "adminlevel" INTEGER
 );
-CREATE TABLE "relationway" (
+CREATE TABLE relationway (
     "relation" INTEGER,
     "way" INTEGER
+, "type" INTEGER);
+ANALYZE sqlite_master;
+INSERT INTO "sqlite_stat1" VALUES('waypoint','waypoingunique','134382 17 1');
+INSERT INTO "sqlite_stat1" VALUES('relationway','relationwayunique','36760 13 1');
+INSERT INTO "sqlite_stat1" VALUES('borderrelations',NULL,'2869');
+CREATE TABLE "waypoint" (
+    "way" INTEGER,
+    "point" INTEGER
 );
 CREATE UNIQUE INDEX "relationwayunique" on relationway (relation ASC, way ASC);
+CREATE UNIQUE INDEX "waypoingunique" on waypoint (way ASC, point ASC);
 COMMIT;

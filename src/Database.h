@@ -13,6 +13,7 @@ public:
 
     void insertBorderRelation(long long int relationid, const std::string & name, int adminlevel);
     void insertRelationWay(long long int relationid, long long int wayid, int type);
+    void insertWayPoint(long long int wayid, long long int pointid);
 
 private:
     sqlite3 *db;
@@ -20,6 +21,7 @@ private:
     sqlite3_stmt *stmtCommitTransaction;
     sqlite3_stmt *stmtInsertBorderRelation;
     sqlite3_stmt *stmtInsertRelationWay;
+    sqlite3_stmt *stmtInsertWayPoint;
 };
 
 #endif // DATABASE_H
