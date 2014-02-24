@@ -18,6 +18,10 @@ Database::Database() {
                        "INSERT OR REPLACE INTO waypoint (way, point)"
                        "VALUES (?1, ?2)",
                        -1, &stmtInsertWayPoint, 0);
+    sqlite3_prepare_v2(db,
+                       "INSERT OR REPLACE INTO point (id, lat, lon)"
+                       "VALUES (?1, ?2, ?3)",
+                       -1, &stmtInsertPoint, 0);
 }
 Database::~Database() {
     sqlite3_finalize(stmtBeginTransaction);
@@ -25,6 +29,7 @@ Database::~Database() {
     sqlite3_finalize(stmtInsertBorderRelation);
     sqlite3_finalize(stmtInsertRelationWay);
     sqlite3_finalize(stmtInsertWayPoint);
+    sqlite3_finalize(stmtInsertPoint);
     sqlite3_close_v2(db);
 }
 
@@ -62,4 +67,12 @@ void Database::insertWayPoint(long long int wayid, long long int pointid) {
     sqlite3_bind_int64(stmtInsertWayPoint, 2, pointid);
     sqlite3_step(stmtInsertWayPoint);
     sqlite3_reset(stmtInsertWayPoint);
+}
+
+void Database::insertPoint(long long int pointid, double lat, double lon) {
+    sqlite3_bind_int64(stmtInsertPoint, 1, pointid);
+    sqlite3_bind_double(stmtInsertPoint, 2, lat);
+    sqlite3_bind_double(stmtInsertPoint, 3, lon);
+    sqlite3_step(stmtInsertPoint);
+    sqlite3_reset(stmtInsertPoint);
 }

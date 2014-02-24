@@ -129,12 +129,12 @@ void inline InformationExtractor::primBlockCallbackPass2(OSMPBF::PrimitiveBlock 
                 long long int wayid = way.id();
                 if(interestingWays.count(wayid) != 0) {
                     debug("  found way %d", wayid);
-                    //   repeated sint64 refs = 8 [packed = true];  // DELTA coded
 
                     long long int pointid = 0;
                     for(int k = 0, l = way.refs_size(); k < l; k++) {
                         pointid += way.refs(k);
                         db.insertWayPoint(wayid, pointid);
+                        interestingPoints.insert(pointid);
                     }
                 }
             }
@@ -143,7 +143,36 @@ void inline InformationExtractor::primBlockCallbackPass2(OSMPBF::PrimitiveBlock 
 }
 
 void inline InformationExtractor::primBlockCallbackPass3(OSMPBF::PrimitiveBlock primblock){
+    long long int lat_offset = primblock.lat_offset();
+    long long int lon_offset = primblock.lon_offset();
+    int granularity = primblock.granularity();
+    for(int i = 0, l = primblock.primitivegroup_size(); i < l; i++) {
+        OSMPBF::PrimitiveGroup pg = primblock.primitivegroup(i);
+        if(pg.nodes_size() > 0) {
+            err("has non-dense nodes and non-dense nodes are not implemented");
+        }
 
+        // tell about dense nodes
+        if(pg.has_dense()) {
+            OSMPBF::DenseNodes nodes = pg.dense();
+            long long int id = 0;
+            long long int latitude = 0;
+            long long int longitude = 0;
+            for(int j = 0, l = nodes.id_size(); j < l; j++) {
+                id += nodes.id(j);
+                latitude += nodes.lat(j);
+                longitude += nodes.lon(j);
+                if(interestingPoints.count(id) != 0) {
+                    double databaseLat, databaseLon;
+
+                    databaseLat = (lat_offset + ((double)granularity * (double)latitude))/OSMPBF::lonlat_resolution;
+                    databaseLon = (lon_offset + ((double)granularity * (double)longitude))/OSMPBF::lonlat_resolution;
+                    db.insertPoint(id, databaseLat, databaseLon);
+                    debug("  point: %d, %d (%F), %d (%F)",id, latitude, databaseLat, longitude, databaseLon);
+                }
+            }
+        }
+    }
 }
 
 void InformationExtractor::init(){

@@ -17,6 +17,7 @@ private:
     int pass;
     Database db;
     std::unordered_set<long long int> interestingWays;
+    std::unordered_set<long long int> interestingPoints;
     void primBlockCallbackPass1(OSMPBF::PrimitiveBlock primblock);
     void primBlockCallbackPass2(OSMPBF::PrimitiveBlock primblock);
     void primBlockCallbackPass3(OSMPBF::PrimitiveBlock primblock);

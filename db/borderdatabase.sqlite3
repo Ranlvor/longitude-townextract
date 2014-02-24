@@ -17,6 +17,11 @@ CREATE TABLE "waypoint" (
     "way" INTEGER,
     "point" INTEGER
 );
+CREATE TABLE "point" (
+    "id" INTEGER PRIMARY KEY,
+    "lat" REAL,
+    "lon" REAL
+);
 CREATE UNIQUE INDEX "relationwayunique" on relationway (relation ASC, way ASC);
 CREATE UNIQUE INDEX "waypoingunique" on waypoint (way ASC, point ASC);
 COMMIT;
