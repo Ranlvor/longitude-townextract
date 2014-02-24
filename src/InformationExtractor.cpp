@@ -1,6 +1,5 @@
 #include "InformationExtractor.h"
 #include "output.h"
-
 InformationExtractor::InformationExtractor()
 {
 }
@@ -14,6 +13,8 @@ void inline InformationExtractor::primBlockCallbackPass1(OSMPBF::PrimitiveBlock 
             debug("  Found relations");
 
             unsigned int adminLevelNumber = 0;
+            unsigned int administrativeNumber = 0;
+            unsigned int boundaryNumber = 0;
             unsigned int nameNumber = 0;
             for(int j = 0, m = stringtable.s_size(); j < m; j++) {
                 std::string current = stringtable.s(j);
@@ -23,35 +24,45 @@ void inline InformationExtractor::primBlockCallbackPass1(OSMPBF::PrimitiveBlock 
                 } else if (current == "name") {
                     nameNumber = j;
                     debug("    name = %d", nameNumber);
+                } else if (current == "administrative") {
+                    administrativeNumber = j;
+                    debug("    administrative = %d", administrativeNumber);
+                } else if (current == "boundary") {
+                    boundaryNumber = j;
+                    debug("    boundary = %d", boundaryNumber);
                 }
             }
 
-            if(adminLevelNumber == 0)
+            if(adminLevelNumber == 0 || administrativeNumber == 0 || boundaryNumber == 0)
                 return; //if adminlevel is not found in the stringtable, it's impossible for a border to apear in this block
 
             for(int j = 0, m = pg.relations_size(); j < m; j++) {
                 OSMPBF::Relation r = pg.relations(j);
-                bool isBorder = false;
+                bool hasAdminLevel = false;
+                bool hasBoundaryAdministrative = false;
 
                 for(int k = 0, n = r.keys_size(); k < n; k++) {
                     if (r.keys(k) == adminLevelNumber){
-                        isBorder = true;
-                        break;
+                        hasAdminLevel = true;
+                    } else if (r.keys(k) == boundaryNumber){
+                        if(r.vals(k) == administrativeNumber)
+                            hasBoundaryAdministrative = true;
                     }
                 }
 
-                if(isBorder){
+                if(hasAdminLevel && hasBoundaryAdministrative){
                     std::string name;
                     std::string adminlevelstr;
+                    long long int id = r.id();
                     for(int k = 0, n = r.keys_size(); k < n; k++) {
                         if (r.keys(k) == adminLevelNumber){
-                            isBorder = true;
                             adminlevelstr = stringtable.s(r.vals(k));
                         } else if (r.keys(k) == nameNumber){
                             name = stringtable.s(r.vals(k));
                         }
                     }
-                    debug("    found border (level %s) %s", adminlevelstr.c_str(), name.c_str());
+
+                    debug("    found border (level %s, id %d) %s", adminlevelstr.c_str(), id, name.c_str());
                 }
             }
             //for(int j = 0; )
