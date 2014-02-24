@@ -86,7 +86,10 @@ void debug(const char* format, ...) {
     msg(format, 37, args);
     va_end(args);
 }
+void iterate(int argc, char *argv[]);
+#include "InformationExtractor.h"
 
+InformationExtractor ie;
 // application main method
 int main(int argc, char *argv[]) {
     // check if the output is a tty so we can use colors
@@ -121,6 +124,19 @@ int main(int argc, char *argv[]) {
     if(optind != argc-1)
         err("usage: %s [--color] file.osm.pbf", argv[0]);
 
+    ie.init();
+    iterate(argc, argv);
+    ie.nextPass();
+    iterate(argc, argv);
+    ie.nextPass();
+    iterate(argc, argv);
+    ie.finish();
+
+    // clean up the protobuf lib
+    google::protobuf::ShutdownProtobufLibrary();
+}
+
+void iterate(int /*argc*/, char *argv[]) {
     // open specified file
     FILE *fp = fopen(argv[optind], "rb");
 
@@ -149,16 +165,16 @@ int main(int argc, char *argv[]) {
             err("unable to parse blob header");
 
         // tell about the blob-header
-        info("\nBlobHeader (%d bytes)", sz);
-        debug("  type = %s", blobheader.type().c_str());
+        info("\n  BlobHeader (%d bytes)", sz);
+        debug("    type = %s", blobheader.type().c_str());
 
         // size of the following blob
         sz = blobheader.datasize();
-        debug("  datasize = %u", sz);
+        debug("    datasize = %u", sz);
 
         // optional indexdata
         if(blobheader.has_indexdata())
-            debug("  indexdata = %u bytes", blobheader.indexdata().size());
+            debug("    indexdata = %u bytes", blobheader.indexdata().size());
 
         // ensure the blob is smaller then MAX_BLOB_SIZE
         if(sz > OSMPBF::max_uncompressed_blob_size)
@@ -173,7 +189,7 @@ int main(int argc, char *argv[]) {
             err("unable to parse blob");
 
         // tell about the blob-header
-        info("Blob (%d bytes)", sz);
+        info("  Blob (%d bytes)", sz);
 
         // set when we find at least one data stream
         bool found_data = false;
@@ -188,10 +204,10 @@ int main(int argc, char *argv[]) {
 
             // check that raw_size is set correctly
             if(sz != blob.raw_size())
-                warn("  reports wrong raw_size: %u bytes", blob.raw_size());
+                warn("    reports wrong raw_size: %u bytes", blob.raw_size());
 
             // tell about the blob-data
-            debug("  contains uncompressed data: %u bytes", sz);
+            debug("    contains uncompressed data: %u bytes", sz);
 
             // copy the uncompressed data over to the unpack_buffer
             memcpy(unpack_buffer, buffer, sz);
@@ -201,7 +217,7 @@ int main(int argc, char *argv[]) {
         if(blob.has_zlib_data()) {
             // issue a warning if there is more than one data steam, a blob may only contain one data stream
             if(found_data)
-                warn("  contains several data streams");
+                warn("    contains several data streams");
 
             // we have at least one datastream
             found_data = true;
@@ -210,8 +226,8 @@ int main(int argc, char *argv[]) {
             sz = blob.zlib_data().size();
 
             // tell about the compressed data
-            debug("  contains zlib-compressed data: %u bytes", sz);
-            debug("  uncompressed size: %u bytes", blob.raw_size());
+            debug("    contains zlib-compressed data: %u bytes", sz);
+            debug("    uncompressed size: %u bytes", blob.raw_size());
 
             // zlib information
             z_stream z;
@@ -234,13 +250,13 @@ int main(int argc, char *argv[]) {
             z.opaque    = Z_NULL;
 
             if(inflateInit(&z) != Z_OK) {
-                err("  failed to init zlib stream");
+                err("    failed to init zlib stream");
             }
             if(inflate(&z, Z_FINISH) != Z_STREAM_END) {
-                err("  failed to inflate zlib stream");
+                err("    failed to inflate zlib stream");
             }
             if(inflateEnd(&z) != Z_OK) {
-                err("  failed to deinit zlib stream");
+                err("    failed to deinit zlib stream");
             }
 
             // unpacked size
@@ -251,14 +267,14 @@ int main(int argc, char *argv[]) {
         if(blob.has_lzma_data()) {
             // issue a warning if there is more than one data steam, a blob may only contain one data stream
             if(found_data)
-                warn("  contains several data streams");
+                warn("    contains several data streams");
 
             // we have at least one datastream
             found_data = true;
 
             // tell about the compressed data
-            debug("  contains lzma-compressed data: %u bytes", blob.lzma_data().size());
-            debug("  uncompressed size: %u bytes", blob.raw_size());
+            debug("    contains lzma-compressed data: %u bytes", blob.lzma_data().size());
+            debug("    uncompressed size: %u bytes", blob.raw_size());
 
             // issue a warning, lzma compression is not yet supported
             err("  lzma-decompression is not supported");
@@ -271,7 +287,7 @@ int main(int argc, char *argv[]) {
         // switch between different blob-types
         if(blobheader.type() == "OSMHeader") {
             // tell about the OSMHeader blob
-            info("  OSMHeader");
+            info("    OSMHeader");
 
             // parse the HeaderBlock from the blob
             if(!headerblock.ParseFromArray(unpack_buffer, sz))
@@ -280,7 +296,7 @@ int main(int argc, char *argv[]) {
             // tell about the bbox
             if(headerblock.has_bbox()) {
                 OSMPBF::HeaderBBox bbox = headerblock.bbox();
-                debug("    bbox: %.7f,%.7f,%.7f,%.7f",
+                debug("      bbox: %.7f,%.7f,%.7f,%.7f",
                     (double)bbox.left() / OSMPBF::lonlat_resolution,
                     (double)bbox.bottom() / OSMPBF::lonlat_resolution,
                     (double)bbox.right() / OSMPBF::lonlat_resolution,
@@ -289,40 +305,40 @@ int main(int argc, char *argv[]) {
 
             // tell about the required features
             for(int i = 0, l = headerblock.required_features_size(); i < l; i++)
-                debug("    required_feature: %s", headerblock.required_features(i).c_str());
+                debug("      required_feature: %s", headerblock.required_features(i).c_str());
 
             // tell about the optional features
             for(int i = 0, l = headerblock.optional_features_size(); i < l; i++)
-                debug("    required_feature: %s", headerblock.optional_features(i).c_str());
+                debug("      optional_feature: %s", headerblock.optional_features(i).c_str());
 
             // tell about the writing program
             if(headerblock.has_writingprogram());
-                debug("    writingprogram: %s", headerblock.writingprogram().c_str());
+                debug("      writingprogram: %s", headerblock.writingprogram().c_str());
 
             // tell about the source
             if(headerblock.has_source())
-                debug("    source: %s", headerblock.source().c_str());
+                debug("      source: %s", headerblock.source().c_str());
         }
 
         else if(blobheader.type() == "OSMData") {
             // tell about the OSMData blob
-            info("  OSMData");
+            info("    OSMData");
 
             // parse the PrimitiveBlock from the blob
             if(!primblock.ParseFromArray(unpack_buffer, sz))
                 err("unable to parse primitive block");
 
             // tell about the block's meta info
-            debug("    granularity: %u", primblock.granularity());
-            debug("    lat_offset: %u", primblock.lat_offset());
-            debug("    lon_offset: %u", primblock.lon_offset());
-            debug("    date_granularity: %u", primblock.date_granularity());
+            debug("      granularity: %u", primblock.granularity());
+            debug("      lat_offset: %u", primblock.lat_offset());
+            debug("      lon_offset: %u", primblock.lon_offset());
+            debug("      date_granularity: %u", primblock.date_granularity());
 
             // tell about the stringtable
-            debug("    stringtable: %u items", primblock.stringtable().s_size());
+            debug("      stringtable: %u items", primblock.stringtable().s_size());
 
             // number of PrimitiveGroups
-            debug("    primitivegroups: %u groups", primblock.primitivegroup_size());
+            debug("      primitivegroups: %u groups", primblock.primitivegroup_size());
 
             // iterate over all PrimitiveGroups
             for(int i = 0, l = primblock.primitivegroup_size(); i < l; i++) {
@@ -335,53 +351,50 @@ int main(int argc, char *argv[]) {
                 if(pg.nodes_size() > 0) {
                     found_items = true;
 
-                    debug("      nodes: %d", pg.nodes_size());
+                    debug("        nodes: %d", pg.nodes_size());
                     if(pg.nodes(0).has_info())
-                        debug("        with meta-info");
+                        debug("          with meta-info");
                 }
 
                 // tell about dense nodes
                 if(pg.has_dense()) {
                     found_items = true;
 
-                    debug("      dense nodes: %d", pg.dense().id_size());
+                    debug("        dense nodes: %d", pg.dense().id_size());
                     if(pg.dense().has_denseinfo())
-                        debug("        with meta-info");
+                        debug("          with meta-info");
                 }
 
                 // tell about ways
                 if(pg.ways_size() > 0) {
                     found_items = true;
 
-                    debug("      ways: %d", pg.ways_size());
+                    debug("        ways: %d", pg.ways_size());
                     if(pg.ways(0).has_info())
-                        debug("        with meta-info");
+                        debug("          with meta-info");
                 }
 
                 // tell about relations
                 if(pg.relations_size() > 0) {
                     found_items = true;
 
-                    debug("      relations: %d", pg.relations_size());
+                    debug("        relations: %d", pg.relations_size());
                     if(pg.relations(0).has_info())
-                        debug("        with meta-info");
+                        debug("          with meta-info");
                 }
 
                 if(!found_items)
-                    warn("      contains no items");
+                    warn("        contains no items");
             }
+            ie.primBlockCallback(primblock);
         }
 
         else {
             // unknown blob type
-            warn("  unknown blob type: %s", blobheader.type().c_str());
+            warn("    unknown blob type: %s", blobheader.type().c_str());
         }
     }
 
     // close the file pointer
     fclose(fp);
-
-    // clean up the protobuf lib
-    google::protobuf::ShutdownProtobufLibrary();
 }
-

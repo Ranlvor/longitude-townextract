@@ -11,11 +11,14 @@ PROTOC = protoc
 
 all: bin/longitude-townextract
 
-bin/longitude-townextract: bin/main.o bin/osmformat.pb.o bin/fileformat.pb.o
-	$(LD) $(LDargs) -o bin/longitude-townextract bin/main.o bin/osmformat.pb.o bin/fileformat.pb.o $(LDlibs)
+bin/longitude-townextract: bin/main.o bin/InformationExtractor.o bin/osmformat.pb.o bin/fileformat.pb.o
+	$(LD) $(LDargs) -o bin/longitude-townextract bin/main.o bin/InformationExtractor.o bin/osmformat.pb.o bin/fileformat.pb.o $(LDlibs)
 
-bin/main.o: src/main.cpp generated/osmformat.pb.cc generated/fileformat.pb.cc
+bin/main.o: src/main.cpp src/InformationExtractor.h generated/osmformat.pb.cc generated/fileformat.pb.cc
 	$(CC) $(CCargs) -o bin/main.o src/main.cpp
+
+bin/InformationExtractor.o: src/InformationExtractor.cpp src/InformationExtractor.h generated/osmformat.pb.cc generated/fileformat.pb.cc src/output.h
+	$(CC) $(CCargs) -o bin/InformationExtractor.o src/InformationExtractor.cpp
 
 generated/osmformat.pb.cc: $(OSMBINARYSRC)/osmformat.proto
 	$(PROTOC) --cpp_out=generated -I$(OSMBINARYSRC) $(OSMBINARYSRC)/osmformat.proto
