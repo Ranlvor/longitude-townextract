@@ -82,7 +82,7 @@ void inline InformationExtractor::primBlockCallbackPass1(OSMPBF::PrimitiveBlock 
 
                 if(hasAdminLevel && hasBoundaryAdministrative){
                     std::string name;
-                    int adminlevel;
+                    int adminlevel = 0;
                     long long int id = r.id();
                     for(int k = 0, n = r.keys_size(); k < n; k++) {
                         if (r.keys(k) == adminLevelNumber){
