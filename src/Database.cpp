@@ -4,6 +4,11 @@
 Database::Database() {
     sqlite3_open("./db/borderdatabase.db", &db);
 
+    sqlite3_stmt *stmttmp;
+    sqlite3_prepare_v2(db, "PRAGMA cache_size = -131072;", -1, &stmttmp, 0);
+    sqlite3_step(stmttmp);
+    sqlite3_finalize(stmttmp);
+
     sqlite3_prepare_v2(db, "BEGIN TRANSACTION;", -1, &stmtBeginTransaction, 0);
     sqlite3_prepare_v2(db, "COMMIT;", -1, &stmtCommitTransaction, 0);
     sqlite3_prepare_v2(db,
