@@ -14,6 +14,9 @@ public:
 
 private:
     int pass;
+    void primBlockCallbackPass1(OSMPBF::PrimitiveBlock primblock);
+    void primBlockCallbackPass2(OSMPBF::PrimitiveBlock primblock);
+    void primBlockCallbackPass3(OSMPBF::PrimitiveBlock primblock);
 };
 
 #endif // INFORMATIONEXTRACTOR_H

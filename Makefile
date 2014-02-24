@@ -5,7 +5,7 @@ OSMBINARYINC = OSM-binary/include
 CC = g++
 LD = g++
 CCargs = -g -c -Wall -I$(OSMBINARYINC)
-LDargs = -Wall 
+LDargs = -Wall
 LDlibs = -pthread -lz -lprotobuf
 PROTOC = protoc
 

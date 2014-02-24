@@ -86,7 +86,7 @@ void debug(const char* format, ...) {
     msg(format, 37, args);
     va_end(args);
 }
-void iterate(int argc, char *argv[]);
+void iterate(int, char *argv[]);
 #include "InformationExtractor.h"
 
 InformationExtractor ie;
@@ -126,11 +126,11 @@ int main(int argc, char *argv[]) {
 
     ie.init();
     iterate(argc, argv);
-    ie.nextPass();
+    /*ie.nextPass();
     iterate(argc, argv);
     ie.nextPass();
     iterate(argc, argv);
-    ie.finish();
+    ie.finish();*/
 
     // clean up the protobuf lib
     google::protobuf::ShutdownProtobufLibrary();
