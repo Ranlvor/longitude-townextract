@@ -26,6 +26,11 @@ void inline InformationExtractor::primBlockCallbackPass1(OSMPBF::PrimitiveBlock 
             unsigned int administrativeNumber = 0;
             unsigned int boundaryNumber = 0;
             unsigned int nameNumber = 0;
+            unsigned int innerNumber = 0;
+            unsigned int outerNumber = 0;
+            unsigned int enclaveNumber = 0;
+            unsigned int exclaveNumber = 0;
+            unsigned int emptyStringNumber = 0;
             for(int j = 0, m = stringtable.s_size(); j < m; j++) {
                 std::string current = stringtable.s(j);
                 if(current == "admin_level") {
@@ -40,6 +45,21 @@ void inline InformationExtractor::primBlockCallbackPass1(OSMPBF::PrimitiveBlock 
                 } else if (current == "boundary") {
                     boundaryNumber = j;
                     debug("    boundary = %d", boundaryNumber);
+                } else if (current == "inner") {
+                    innerNumber = j;
+                    debug("    inner = %d", innerNumber);
+                } else if (current == "outer") {
+                    outerNumber = j;
+                    debug("    outer = %d", outerNumber);
+                } else if (current == "enclave") {
+                    enclaveNumber = j;
+                    debug("    enclave = %d", enclaveNumber);
+                } else if (current == "exclave") {
+                    exclaveNumber = j;
+                    debug("    exclave = %d", exclaveNumber);
+                } else if (current == "") {
+                    emptyStringNumber = j;
+                    debug("    (empty string) = %d", emptyStringNumber);
                 }
             }
 
@@ -74,6 +94,25 @@ void inline InformationExtractor::primBlockCallbackPass1(OSMPBF::PrimitiveBlock 
 
                     debug("    found border (level %d, id %d) %s", adminlevel, id, name.c_str());
                     db.insertBorderRelation(id, name, adminlevel);
+
+                    long long int memid = 0;
+                    for(int a = 0, b = r.memids_size(); a < b; a++) {
+                        memid += r.memids(a);
+                        if(r.types(a) == r.WAY) {
+                            int role = -1;
+                            unsigned int roleStringId = r.roles_sid(a);
+                            if(roleStringId == 0 || roleStringId == outerNumber || roleStringId == exclaveNumber || roleStringId == emptyStringNumber)
+                                role = 1;
+                            else if (roleStringId == innerNumber || roleStringId == enclaveNumber)
+                                role = 0;
+
+                            if(role < 0) {
+                                warn("      found way (%d) of unknown role (%s)", memid, stringtable.s(roleStringId).c_str());
+                            } else {
+                                db.insertRelationWay(id, memid, role);
+                            }
+                        }
+                    }
                 }
             }
         }

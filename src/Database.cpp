@@ -10,8 +10,10 @@ Database::Database() {
                        "INSERT OR REPLACE INTO borderrelations (relationid, name, adminlevel)"
                        "VALUES (?1, ?2, ?3)",
                        -1, &stmtInsertBorderRelation, 0);
-    //sqlite3_stmt *stmtInsertBorderRelation;
-    //sqlite3_stmt *stmtInsertRelationWay;
+    sqlite3_prepare_v2(db,
+                       "INSERT OR REPLACE INTO relationway (relation, way, type)"
+                       "VALUES (?1, ?2, ?3)",
+                       -1, &stmtInsertRelationWay, 0);
 }
 Database::~Database() {
     sqlite3_finalize(stmtBeginTransaction);
@@ -32,7 +34,7 @@ void Database::commitTransaction() {
 }
 
 void Database::insertBorderRelation(long long int relationid, const std::string & name, int adminlevel) {
-    debug("Database::insertBorderRelation(%d, %s, %d", relationid, name.c_str(), adminlevel);
+    //debug("Database::insertBorderRelation(%d, %s, %d", relationid, name.c_str(), adminlevel);
     sqlite3_bind_int64(stmtInsertBorderRelation, 1, relationid);
     sqlite3_bind_text(stmtInsertBorderRelation, 2, name.c_str(), -1, SQLITE_TRANSIENT);
     sqlite3_bind_int(stmtInsertBorderRelation, 3, adminlevel);
@@ -40,6 +42,11 @@ void Database::insertBorderRelation(long long int relationid, const std::string 
     sqlite3_reset(stmtInsertBorderRelation);
 }
 
-void Database::insertRelationWay(long long int relationid, long long int wayid) {
-
+//type: 0 = inner, 1 = outer
+void Database::insertRelationWay(long long int relationid, long long int wayid, int type) {
+    sqlite3_bind_int64(stmtInsertRelationWay, 1, relationid);
+    sqlite3_bind_int64(stmtInsertRelationWay, 2, wayid);
+    sqlite3_bind_int(stmtInsertRelationWay, 3, type);
+    sqlite3_step(stmtInsertRelationWay);
+    sqlite3_reset(stmtInsertRelationWay);
 }
