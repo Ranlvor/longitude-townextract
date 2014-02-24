@@ -16,6 +16,8 @@ public:
     void insertWayPoint(long long int wayid, long long int pointid);
     void insertPoint(long long int pointid, double lat, double lon);
 
+    void buildBoundingboxIndex();
+
 private:
     sqlite3 *db;
     sqlite3_stmt *stmtBeginTransaction;

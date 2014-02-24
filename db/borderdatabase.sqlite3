@@ -10,6 +10,8 @@ CREATE TABLE relationway (
     "way" INTEGER
 , "type" INTEGER);
 ANALYZE sqlite_master;
+INSERT INTO "sqlite_stat1" VALUES('boundingboxes','boundingboxindex','2867 2 2 2 2 1');
+INSERT INTO "sqlite_stat1" VALUES('point',NULL,'123583');
 INSERT INTO "sqlite_stat1" VALUES('waypoint','waypoingunique','134382 17 1');
 INSERT INTO "sqlite_stat1" VALUES('relationway','relationwayunique','36760 13 1');
 INSERT INTO "sqlite_stat1" VALUES('borderrelations',NULL,'2869');
@@ -22,6 +24,14 @@ CREATE TABLE "point" (
     "lat" REAL,
     "lon" REAL
 );
+CREATE TABLE "boundingboxes" (
+    "relationid" INTEGER PRIMARY KEY,
+    "minlat" REAL,
+    "maxlat" REAL,
+    "minlon" REAL,
+    "maxlon" REAL
+);
 CREATE UNIQUE INDEX "relationwayunique" on relationway (relation ASC, way ASC);
 CREATE UNIQUE INDEX "waypoingunique" on waypoint (way ASC, point ASC);
+CREATE UNIQUE INDEX "boundingboxindex" on boundingboxes (minlat ASC, maxlat ASC, minlon ASC, maxlon ASC, relationid ASC);
 COMMIT;

@@ -207,4 +207,6 @@ void InformationExtractor::primBlockCallback(OSMPBF::PrimitiveBlock primblock){
 
 void InformationExtractor::finish(){
     db.commitTransaction();
+    info("\nBuilding boundingbox-index");
+    db.buildBoundingboxIndex();
 }

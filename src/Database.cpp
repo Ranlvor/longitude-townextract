@@ -76,3 +76,18 @@ void Database::insertPoint(long long int pointid, double lat, double lon) {
     sqlite3_step(stmtInsertPoint);
     sqlite3_reset(stmtInsertPoint);
 }
+
+void Database::buildBoundingboxIndex() {
+    sqlite3_stmt *stmttmp;
+    sqlite3_prepare_v2(db,
+                       "INSERT INTO boundingboxes "
+                       "SELECT rw.relation, MIN(p.lat) as minlat, MAX(p.lat) as maxlat, MIN(p.lon) as minlon, MAX(p.lon) as maxlon "
+
+                       "FROM relationway as rw "
+                       " LEFT JOIN waypoint as wp ON (rw.way = wp.way) "
+                       " LEFT JOIN point as p ON (wp.point = p.id) "
+                       "GROUP BY rw.relation; ",
+                       -1, &stmttmp, 0);
+    sqlite3_step(stmttmp);
+    sqlite3_finalize(stmttmp);
+}
