@@ -27,7 +27,22 @@ Database::Database() {
                        "INSERT OR REPLACE INTO point (id, lat, lon)"
                        "VALUES (?1, ?2, ?3)",
                        -1, &stmtInsertPoint, 0);
+
+    sqlite3_prepare_v2(db,
+                       "SELECT br.relationid, br.name, br.adminlevel "
+
+                       "FROM boundingboxes AS bb "
+                       "  LEFT JOIN borderrelations AS br ON (br.relationid = bb.relationid) "
+
+                       "WHERE bb.minlat < ?1 "
+                       "  AND bb.maxlat > ?1 "
+                       "  AND bb.minlon < ?2 "
+                       "  AND bb.maxlon > ?2 "
+
+                       "ORDER BY br.adminlevel DESC",
+                       -1, &stmtGetPossibleBorderrelations, 0);
 }
+
 Database::~Database() {
     sqlite3_finalize(stmtBeginTransaction);
     sqlite3_finalize(stmtCommitTransaction);
@@ -35,6 +50,7 @@ Database::~Database() {
     sqlite3_finalize(stmtInsertRelationWay);
     sqlite3_finalize(stmtInsertWayPoint);
     sqlite3_finalize(stmtInsertPoint);
+    sqlite3_finalize(stmtGetPossibleBorderrelations);
     sqlite3_close_v2(db);
 }
 
@@ -95,4 +111,23 @@ void Database::buildBoundingboxIndex() {
                        -1, &stmttmp, 0);
     sqlite3_step(stmttmp);
     sqlite3_finalize(stmttmp);
+}
+
+
+std::vector<Borderrelation> Database::getPossibleBorderrelations(double lat, double lon){
+    std::vector<Borderrelation> matches;
+    debug("Searching...");
+    sqlite3_bind_double(stmtGetPossibleBorderrelations, 1, lat);
+    sqlite3_bind_double(stmtGetPossibleBorderrelations, 2, lon);
+    //while(true) {debug("step: ", sqlite3_step(stmtGetPossibleBorderrelations));}
+    while (sqlite3_step(stmtGetPossibleBorderrelations) == SQLITE_ROW){
+        Borderrelation tmp;
+        tmp.relationid = sqlite3_column_int64(stmtGetPossibleBorderrelations, 0);
+        tmp.adminlevel = sqlite3_column_int(stmtGetPossibleBorderrelations, 3);
+        tmp.name = (const char*) sqlite3_column_text(stmtGetPossibleBorderrelations, 1);
+        matches.push_back(tmp);
+    }
+
+    sqlite3_reset(stmtGetPossibleBorderrelations);
+    return matches;
 }

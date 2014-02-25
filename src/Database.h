@@ -1,7 +1,15 @@
 #ifndef DATABASE_H
 #define DATABASE_H
 #include<string>
+#include<vector>
 #include <sqlite3.h>
+
+struct Borderrelation {
+    long long int relationid;
+    int adminlevel;
+    std::string name;
+};
+
 class Database
 {
 public:
@@ -18,6 +26,8 @@ public:
 
     void buildBoundingboxIndex();
 
+    std::vector<Borderrelation> getPossibleBorderrelations(double lat, double lon);
+
 private:
     sqlite3 *db;
     sqlite3_stmt *stmtBeginTransaction;
@@ -26,6 +36,7 @@ private:
     sqlite3_stmt *stmtInsertRelationWay;
     sqlite3_stmt *stmtInsertWayPoint;
     sqlite3_stmt *stmtInsertPoint;
+    sqlite3_stmt *stmtGetPossibleBorderrelations;
 };
 
 #endif // DATABASE_H

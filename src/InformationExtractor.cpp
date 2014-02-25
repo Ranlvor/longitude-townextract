@@ -1,17 +1,9 @@
 #include "InformationExtractor.h"
 #include "output.h"
+#include "stringToNumber.h"
 #include <string>
-#include <sstream>
 InformationExtractor::InformationExtractor()
 {
-}
-
-template <typename T>
-T StringToNumber ( const std::string &Text )//Text not by const reference so that the function can be used with a
-{                               //character array as argument
-    std::stringstream ss(Text);
-    T result;
-    return ss >> result ? result : 0;
 }
 
 void inline InformationExtractor::primBlockCallbackPass1(OSMPBF::PrimitiveBlock primblock){
