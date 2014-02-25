@@ -9,13 +9,13 @@ LDargs = -Wall  -std=c++11 -O3
 LDlibs = -pthread -lz -lprotobuf -lsqlite3
 PROTOC = protoc
 
-all: bin/longitude-townextract
+all: bin/importer
 
-bin/longitude-townextract: bin/main.o bin/InformationExtractor.o bin/Database.o bin/osmformat.pb.o bin/fileformat.pb.o
-	$(LD) $(LDargs) -o bin/longitude-townextract bin/main.o bin/InformationExtractor.o bin/Database.o bin/osmformat.pb.o bin/fileformat.pb.o $(LDlibs)
+bin/importer: bin/importer.o bin/InformationExtractor.o bin/Database.o bin/osmformat.pb.o bin/fileformat.pb.o
+	$(LD) $(LDargs) -o bin/importer bin/importer.o bin/InformationExtractor.o bin/Database.o bin/osmformat.pb.o bin/fileformat.pb.o $(LDlibs)
 
-bin/main.o: src/main.cpp src/InformationExtractor.h src/Database.h generated/osmformat.pb.cc generated/fileformat.pb.cc
-	$(CC) $(CCargs) -o bin/main.o src/main.cpp
+bin/importer.o: src/importer.cpp src/InformationExtractor.h src/Database.h generated/osmformat.pb.cc generated/fileformat.pb.cc
+	$(CC) $(CCargs) -o bin/importer.o src/importer.cpp
 
 bin/InformationExtractor.o: src/InformationExtractor.cpp src/InformationExtractor.h src/Database.h generated/osmformat.pb.cc generated/fileformat.pb.cc src/output.h
 	$(CC) $(CCargs) -o bin/InformationExtractor.o src/InformationExtractor.cpp
