@@ -41,6 +41,19 @@ Database::Database() {
 
                        "ORDER BY br.adminlevel DESC",
                        -1, &stmtGetPossibleBorderrelations, 0);
+
+
+    sqlite3_prepare_v2(db,
+                       "SELECT relationway.way AS way, relationway.type AS type, waypoint.point AS point, point.lat AS lat, point.lon AS lon "
+
+                       "FROM relationway "
+                       "  LEFT JOIN waypoint ON (relationway.way = waypoint.way) "
+                       "  LEFT JOIN point ON (waypoint.point = point.id) "
+
+                       "WHERE relationway.relation = ?1 "
+
+                       "ORDER BY way ASC; ",
+                       -1, &stmtGetBorderGeometry, 0);
 }
 
 Database::~Database() {
@@ -51,6 +64,7 @@ Database::~Database() {
     sqlite3_finalize(stmtInsertWayPoint);
     sqlite3_finalize(stmtInsertPoint);
     sqlite3_finalize(stmtGetPossibleBorderrelations);
+    sqlite3_finalize(stmtGetBorderGeometry);
     sqlite3_close_v2(db);
 }
 
@@ -74,7 +88,7 @@ void Database::insertBorderRelation(long long int relationid, const std::string 
 }
 
 //type: 0 = inner, 1 = outer
-void Database::insertRelationWay(long long int relationid, long long int wayid, int type) {
+void Database::insertRelationWay(long long int relationid, long long int wayid, WayType type) {
     sqlite3_bind_int64(stmtInsertRelationWay, 1, relationid);
     sqlite3_bind_int64(stmtInsertRelationWay, 2, wayid);
     sqlite3_bind_int(stmtInsertRelationWay, 3, type);
@@ -116,10 +130,8 @@ void Database::buildBoundingboxIndex() {
 
 std::vector<Borderrelation> Database::getPossibleBorderrelations(double lat, double lon){
     std::vector<Borderrelation> matches;
-    debug("Searching...");
     sqlite3_bind_double(stmtGetPossibleBorderrelations, 1, lat);
     sqlite3_bind_double(stmtGetPossibleBorderrelations, 2, lon);
-    //while(true) {debug("step: ", sqlite3_step(stmtGetPossibleBorderrelations));}
     while (sqlite3_step(stmtGetPossibleBorderrelations) == SQLITE_ROW){
         Borderrelation tmp;
         tmp.relationid = sqlite3_column_int64(stmtGetPossibleBorderrelations, 0);
@@ -130,4 +142,35 @@ std::vector<Borderrelation> Database::getPossibleBorderrelations(double lat, dou
 
     sqlite3_reset(stmtGetPossibleBorderrelations);
     return matches;
+}
+
+std::vector<Way> Database::getBorderGeometry(long long int borderid){
+    std::vector<Way> geometry;
+    sqlite3_bind_int64(stmtGetBorderGeometry, 1, borderid);
+    Way way;
+    Point p;
+    way.id = -1;
+    while (sqlite3_step(stmtGetBorderGeometry) == SQLITE_ROW){
+        long long int wayid = sqlite3_column_int64(stmtGetBorderGeometry, 0);
+        WayType type = (WayType) sqlite3_column_int(stmtGetBorderGeometry, 1);
+        long long int pointid = sqlite3_column_int64(stmtGetBorderGeometry, 2);
+        double latitude = sqlite3_column_double(stmtGetBorderGeometry, 3);
+        double longitude = sqlite3_column_double(stmtGetBorderGeometry, 4);
+        if(way.id != wayid){
+            if(way.id != -1) {
+                geometry.push_back(way);
+                way.points.clear();
+            }
+            way.id = wayid;
+            way.type = type;
+        }
+        p.id = pointid;
+        p.latitude = latitude;
+        p.longitude = longitude;
+        way.points.push_back(p);
+    }
+    geometry.push_back(way);
+
+    sqlite3_reset(stmtGetBorderGeometry);
+    return geometry;
 }

@@ -10,6 +10,19 @@ struct Borderrelation {
     std::string name;
 };
 
+struct Point {
+    long long int id;
+    double latitude;
+    double longitude;
+};
+
+enum WayType{ invalid = -1, inner = 0, outer = 1 };
+struct Way {
+    long long int id;
+    WayType type;
+    std::vector<Point> points;
+};
+
 class Database
 {
 public:
@@ -20,13 +33,15 @@ public:
     void commitTransaction();
 
     void insertBorderRelation(long long int relationid, const std::string & name, int adminlevel);
-    void insertRelationWay(long long int relationid, long long int wayid, int type);
+    void insertRelationWay(long long int relationid, long long int wayid, WayType type);
     void insertWayPoint(long long int wayid, long long int pointid);
     void insertPoint(long long int pointid, double lat, double lon);
 
     void buildBoundingboxIndex();
 
     std::vector<Borderrelation> getPossibleBorderrelations(double lat, double lon);
+
+    std::vector<Way> getBorderGeometry(long long int borderid);
 
 private:
     sqlite3 *db;
@@ -37,6 +52,7 @@ private:
     sqlite3_stmt *stmtInsertWayPoint;
     sqlite3_stmt *stmtInsertPoint;
     sqlite3_stmt *stmtGetPossibleBorderrelations;
+    sqlite3_stmt *stmtGetBorderGeometry;
 };
 
 #endif // DATABASE_H

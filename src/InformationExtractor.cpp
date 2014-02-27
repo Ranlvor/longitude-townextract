@@ -91,14 +91,14 @@ void inline InformationExtractor::primBlockCallbackPass1(OSMPBF::PrimitiveBlock 
                     for(int a = 0, b = r.memids_size(); a < b; a++) {
                         memid += r.memids(a);
                         if(r.types(a) == r.WAY) {
-                            int role = -1;
+                            WayType role = invalid;
                             unsigned int roleStringId = r.roles_sid(a);
                             if(roleStringId == 0 || roleStringId == outerNumber || roleStringId == exclaveNumber || roleStringId == emptyStringNumber)
-                                role = 1;
+                                role = outer;
                             else if (roleStringId == innerNumber || roleStringId == enclaveNumber)
-                                role = 0;
+                                role = inner;
 
-                            if(role < 0) {
+                            if(role == invalid) {
                                 warn("      found way (%d) of unknown role (%s)", memid, stringtable.s(roleStringId).c_str());
                             } else {
                                 db.insertRelationWay(id, memid, role);
