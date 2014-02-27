@@ -168,17 +168,21 @@ void iterate(int /*argc*/, char *argv[], long long int minblock, long long int m
         if(!blobheader.ParseFromArray(buffer, sz))
             err("unable to parse blob header");
 
+#ifdef DEBUTOUGPUT
         // tell about the blob-header
         info("\n  BlobHeader (%d bytes)", sz);
         debug("    type = %s", blobheader.type().c_str());
+#endif //DEBUTOUTPUT
 
         // size of the following blob
         sz = blobheader.datasize();
+#ifdef DEBUTOUGPUT
         debug("    datasize = %u", sz);
 
         // optional indexdata
         if(blobheader.has_indexdata())
             debug("    indexdata = %u bytes", blobheader.indexdata().size());
+#endif //DEBUTOUTPUT
 
         // ensure the blob is smaller then MAX_BLOB_SIZE
         if(sz > OSMPBF::max_uncompressed_blob_size)
@@ -192,8 +196,10 @@ void iterate(int /*argc*/, char *argv[], long long int minblock, long long int m
         if(!blob.ParseFromArray(buffer, sz))
             err("unable to parse blob");
 
+#ifdef DEBUTOUGPUT
         // tell about the blob-header
         info("  Blob (%d bytes)", sz);
+#endif //DEBUTOUTPUT
 
         // set when we find at least one data stream
         bool found_data = false;
@@ -210,8 +216,10 @@ void iterate(int /*argc*/, char *argv[], long long int minblock, long long int m
             if(sz != blob.raw_size())
                 warn("    reports wrong raw_size: %u bytes", blob.raw_size());
 
+#ifdef DEBUTOUGPUT
             // tell about the blob-data
             debug("    contains uncompressed data: %u bytes", sz);
+#endif //DEBUTOUTPUT
 
             // copy the uncompressed data over to the unpack_buffer
             memcpy(unpack_buffer, buffer, sz);
@@ -229,9 +237,11 @@ void iterate(int /*argc*/, char *argv[], long long int minblock, long long int m
             // the size of the compressesd data
             sz = blob.zlib_data().size();
 
+#ifdef DEBUTOUGPUT
             // tell about the compressed data
             debug("    contains zlib-compressed data: %u bytes", sz);
             debug("    uncompressed size: %u bytes", blob.raw_size());
+#endif //DEBUTOUTPUT
 
             // zlib information
             z_stream z;
@@ -276,9 +286,11 @@ void iterate(int /*argc*/, char *argv[], long long int minblock, long long int m
             // we have at least one datastream
             found_data = true;
 
+#ifdef DEBUTOUGPUT
             // tell about the compressed data
             debug("    contains lzma-compressed data: %u bytes", blob.lzma_data().size());
             debug("    uncompressed size: %u bytes", blob.raw_size());
+#endif //DEBUTOUTPUT
 
             // issue a warning, lzma compression is not yet supported
             err("  lzma-decompression is not supported");
@@ -325,13 +337,16 @@ void iterate(int /*argc*/, char *argv[], long long int minblock, long long int m
         }
 
         else if(blobheader.type() == "OSMData") {
+#ifdef DEBUTOUGPUT
             // tell about the OSMData blob
             info("    OSMData");
+#endif //DEBUTOUTPUT
 
             // parse the PrimitiveBlock from the blob
             if(!primblock.ParseFromArray(unpack_buffer, sz))
                 err("unable to parse primitive block");
 
+#ifdef DEBUTOUGPUT
             // tell about the block's meta info
             debug("      granularity: %u", primblock.granularity());
             debug("      lat_offset: %u", primblock.lat_offset());
@@ -343,6 +358,7 @@ void iterate(int /*argc*/, char *argv[], long long int minblock, long long int m
 
             // number of PrimitiveGroups
             debug("      primitivegroups: %u groups", primblock.primitivegroup_size());
+#endif //DEBUTOUTPUT
 
             // iterate over all PrimitiveGroups
             for(int i = 0, l = primblock.primitivegroup_size(); i < l; i++) {
@@ -359,9 +375,11 @@ void iterate(int /*argc*/, char *argv[], long long int minblock, long long int m
                     if(blockadress > maxPointBlock)
                         maxPointBlock = blockadress;
 
+#ifdef DEBUTOUGPUT
                     debug("        nodes: %d", pg.nodes_size());
                     if(pg.nodes(0).has_info())
                         debug("          with meta-info");
+#endif //DEBUTOUTPUT
                 }
 
                 // tell about dense nodes
@@ -372,9 +390,11 @@ void iterate(int /*argc*/, char *argv[], long long int minblock, long long int m
                     if(blockadress > maxPointBlock)
                         maxPointBlock = blockadress;
 
+#ifdef DEBUTOUGPUT
                     debug("        dense nodes: %d", pg.dense().id_size());
                     if(pg.dense().has_denseinfo())
                         debug("          with meta-info");
+#endif //DEBUTOUTPUT
                 }
 
                 // tell about ways
@@ -385,18 +405,22 @@ void iterate(int /*argc*/, char *argv[], long long int minblock, long long int m
                     if(blockadress > maxWayBlock)
                         maxWayBlock = blockadress;
 
+#ifdef DEBUTOUGPUT
                     debug("        ways: %d", pg.ways_size());
                     if(pg.ways(0).has_info())
                         debug("          with meta-info");
+#endif //DEBUTOUTPUT
                 }
 
                 // tell about relations
                 if(pg.relations_size() > 0) {
                     found_items = true;
 
+#ifdef DEBUTOUGPUT
                     debug("        relations: %d", pg.relations_size());
                     if(pg.relations(0).has_info())
                         debug("          with meta-info");
+#endif //DEBUTOUTPUT
                 }
 
                 if(!found_items)

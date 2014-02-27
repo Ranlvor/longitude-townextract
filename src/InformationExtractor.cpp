@@ -12,8 +12,9 @@ void inline InformationExtractor::primBlockCallbackPass1(OSMPBF::PrimitiveBlock 
         // one PrimitiveGroup from the the Block
         OSMPBF::PrimitiveGroup pg = primblock.primitivegroup(i);
         if(pg.relations_size() > 0) {
+#ifdef DEBUTOUGPUT
             debug("  Found relations");
-
+#endif //DEBUTOUTPUT
             unsigned int adminLevelNumber = 0;
             unsigned int administrativeNumber = 0;
             unsigned int boundaryNumber = 0;
@@ -27,31 +28,49 @@ void inline InformationExtractor::primBlockCallbackPass1(OSMPBF::PrimitiveBlock 
                 std::string current = stringtable.s(j);
                 if(current == "admin_level") {
                     adminLevelNumber = j;
+#ifdef DEBUTOUGPUT
                     debug("    adminLevel = %d", adminLevelNumber);
+#endif //DEBUTOUTPUT
                 } else if (current == "name") {
                     nameNumber = j;
+#ifdef DEBUTOUGPUT
                     debug("    name = %d", nameNumber);
+#endif //DEBUTOUTPUT
                 } else if (current == "administrative") {
                     administrativeNumber = j;
+#ifdef DEBUTOUGPUT
                     debug("    administrative = %d", administrativeNumber);
+#endif //DEBUTOUTPUT
                 } else if (current == "boundary") {
                     boundaryNumber = j;
+#ifdef DEBUTOUGPUT
                     debug("    boundary = %d", boundaryNumber);
+#endif //DEBUTOUTPUT
                 } else if (current == "inner") {
                     innerNumber = j;
+#ifdef DEBUTOUGPUT
                     debug("    inner = %d", innerNumber);
+#endif //DEBUTOUTPUT
                 } else if (current == "outer") {
                     outerNumber = j;
+#ifdef DEBUTOUGPUT
                     debug("    outer = %d", outerNumber);
+#endif //DEBUTOUTPUT
                 } else if (current == "enclave") {
                     enclaveNumber = j;
+#ifdef DEBUTOUGPUT
                     debug("    enclave = %d", enclaveNumber);
+#endif //DEBUTOUTPUT
                 } else if (current == "exclave") {
                     exclaveNumber = j;
+#ifdef DEBUTOUGPUT
                     debug("    exclave = %d", exclaveNumber);
+#endif //DEBUTOUTPUT
                 } else if (current == "") {
                     emptyStringNumber = j;
+#ifdef DEBUTOUGPUT
                     debug("    (empty string) = %d", emptyStringNumber);
+#endif //DEBUTOUTPUT
                 }
             }
 
@@ -83,8 +102,9 @@ void inline InformationExtractor::primBlockCallbackPass1(OSMPBF::PrimitiveBlock 
                             name = stringtable.s(r.vals(k));
                         }
                     }
-
+#ifdef DEBUTOUGPUT
                     debug("    found border (level %d, id %d) %s", adminlevel, id, name.c_str());
+#endif //DEBUTOUTPUT
                     db.insertBorderRelation(id, name, adminlevel);
 
                     long long int memid = 0;
@@ -120,7 +140,10 @@ void inline InformationExtractor::primBlockCallbackPass2(OSMPBF::PrimitiveBlock 
                 OSMPBF::Way way = pg.ways(j);
                 long long int wayid = way.id();
                 if(interestingWays.count(wayid) != 0) {
+
+#ifdef DEBUTOUGPUT
                     debug("  found way %d", wayid);
+#endif //DEBUTOUTPUT
 
                     long long int pointid = 0;
                     for(int k = 0, l = way.refs_size(); k < l; k++) {
@@ -160,7 +183,9 @@ void inline InformationExtractor::primBlockCallbackPass3(OSMPBF::PrimitiveBlock 
                     databaseLat = (lat_offset + ((double)granularity * (double)latitude))/OSMPBF::lonlat_resolution;
                     databaseLon = (lon_offset + ((double)granularity * (double)longitude))/OSMPBF::lonlat_resolution;
                     db.insertPoint(id, databaseLat, databaseLon);
+#ifdef DEBUTOUGPUT
                     debug("  point: %d, %d (%F), %d (%F)",id, latitude, databaseLat, longitude, databaseLon);
+#endif //DEBUTOUTPUT
                 }
             }
         }
@@ -184,7 +209,10 @@ void InformationExtractor::nextPass(){
 }
 
 void InformationExtractor::primBlockCallback(OSMPBF::PrimitiveBlock primblock){
+#ifdef DEBUTOUGPUT
     debug("InformationExtractor::primBlockCallback");
+#endif //DEBUTOUTPUT
+
     switch (pass){
         case 1:
             return primBlockCallbackPass1(primblock);
