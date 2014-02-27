@@ -136,7 +136,7 @@ std::vector<Borderrelation> Database::getPossibleBorderrelations(double lat, dou
     while (sqlite3_step(stmtGetPossibleBorderrelations) == SQLITE_ROW){
         Borderrelation tmp;
         tmp.relationid = sqlite3_column_int64(stmtGetPossibleBorderrelations, 0);
-        tmp.adminlevel = sqlite3_column_int(stmtGetPossibleBorderrelations, 3);
+        tmp.adminlevel = sqlite3_column_int(stmtGetPossibleBorderrelations, 2);
         tmp.name = (const char*) sqlite3_column_text(stmtGetPossibleBorderrelations, 1);
         matches.push_back(tmp);
     }
