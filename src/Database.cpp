@@ -20,8 +20,8 @@ Database::Database() {
                        "VALUES (?1, ?2, ?3)",
                        -1, &stmtInsertRelationWay, 0);
     sqlite3_prepare_v2(db,
-                       "INSERT OR REPLACE INTO waypoint (way, point)"
-                       "VALUES (?1, ?2)",
+                       "INSERT OR REPLACE INTO waypoint (way, point, 'order')"
+                       "VALUES (?1, ?2, ?3)",
                        -1, &stmtInsertWayPoint, 0);
     sqlite3_prepare_v2(db,
                        "INSERT OR REPLACE INTO point (id, lat, lon)"
@@ -52,7 +52,7 @@ Database::Database() {
 
                        "WHERE relationway.relation = ?1 "
 
-                       "ORDER BY way ASC; ",
+                       "ORDER BY way ASC, waypoint.'order' ASC",
                        -1, &stmtGetBorderGeometry, 0);
 }
 
@@ -97,9 +97,10 @@ void Database::insertRelationWay(long long int relationid, long long int wayid, 
 }
 
 
-void Database::insertWayPoint(long long int wayid, long long int pointid) {
+void Database::insertWayPoint(long long int wayid, long long int pointid, int order) {
     sqlite3_bind_int64(stmtInsertWayPoint, 1, wayid);
     sqlite3_bind_int64(stmtInsertWayPoint, 2, pointid);
+    sqlite3_bind_int(stmtInsertWayPoint, 3, order);
     sqlite3_step(stmtInsertWayPoint);
     sqlite3_reset(stmtInsertWayPoint);
 }

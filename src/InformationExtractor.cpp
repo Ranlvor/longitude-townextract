@@ -125,7 +125,7 @@ void inline InformationExtractor::primBlockCallbackPass2(OSMPBF::PrimitiveBlock 
                     long long int pointid = 0;
                     for(int k = 0, l = way.refs_size(); k < l; k++) {
                         pointid += way.refs(k);
-                        db.insertWayPoint(wayid, pointid);
+                        db.insertWayPoint(wayid, pointid, k);
                         interestingPoints.insert(pointid);
                     }
                 }

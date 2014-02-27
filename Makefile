@@ -4,8 +4,8 @@ OSMBINARYSRC = OSM-binary/src
 OSMBINARYINC = OSM-binary/include
 CC = g++
 LD = g++
-CCargs = -g -c -Wall -I$(OSMBINARYINC) -std=c++11
-LDargs = -g -Wall  -std=c++11
+CCargs = -g -c -Wall -I$(OSMBINARYINC) -std=c++11 -O3
+LDargs = -g -Wall  -std=c++11 -O3
 PROTOC = protoc
 
 all: bin/importer bin/lookupcli

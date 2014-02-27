@@ -34,7 +34,7 @@ public:
 
     void insertBorderRelation(long long int relationid, const std::string & name, int adminlevel);
     void insertRelationWay(long long int relationid, long long int wayid, WayType type);
-    void insertWayPoint(long long int wayid, long long int pointid);
+    void insertWayPoint(long long int wayid, long long int pointid, int order);
     void insertPoint(long long int pointid, double lat, double lon);
 
     void buildBoundingboxIndex();
