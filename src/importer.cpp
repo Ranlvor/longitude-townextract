@@ -24,22 +24,22 @@
 bool usecolor = false;
 
 // buffer for reading a compressed blob from file
-char buffer[OSMPBF::max_uncompressed_blob_size];
+char * gbuffer;
 
 // buffer for decompressing the blob
-char unpack_buffer[OSMPBF::max_uncompressed_blob_size];
+char * gunpack_buffer;
 
 // pbf struct of a BlobHeader
-OSMPBF::BlobHeader blobheader;
+OSMPBF::BlobHeader * gblobheader;
 
 // pbf struct of a Blob
-OSMPBF::Blob blob;
+OSMPBF::Blob * gblob;
 
 // pbf struct of an OSM HeaderBlock
-OSMPBF::HeaderBlock headerblock;
+OSMPBF::HeaderBlock * gheaderblock;
 
 // pbf struct of an OSM PrimitiveBlock
-OSMPBF::PrimitiveBlock primblock;
+OSMPBF::PrimitiveBlock * gprimblock;
 
 // prints a formatted message to stdout, optionally color coded
 void msg(const char* format, int color, va_list args) {
@@ -91,6 +91,8 @@ void iterate(int, char *argv[], long long minblock, long long maxblock);
 
 InformationExtractor ie;
 long long int minWayBlock = -1, maxWayBlock = -1, minPointBlock = -1, maxPointBlock = -1;
+void release();
+void allocate();
 // application main method
 int main(int argc, char *argv[]) {
     // check if the output is a tty so we can use colors
@@ -126,17 +128,43 @@ int main(int argc, char *argv[]) {
         err("usage: %s [--color] file.osm.pbf", argv[0]);
 
     ie.init();
+    allocate();
     iterate(argc, argv, 0, -1);
     ie.nextPass();
     iterate(argc, argv, minWayBlock, maxWayBlock);
     ie.nextPass();
     iterate(argc, argv, minPointBlock, maxPointBlock);
-    // clean up the protobuf lib
-    google::protobuf::ShutdownProtobufLibrary();
+    release();
     ie.finish();
 }
 
+void allocate(){
+    gbuffer = new char[OSMPBF::max_uncompressed_blob_size];
+    gunpack_buffer = new char[OSMPBF::max_uncompressed_blob_size];
+    gblobheader = new OSMPBF::BlobHeader();
+    gblob = new OSMPBF::Blob();
+    gheaderblock = new OSMPBF::HeaderBlock();
+    gprimblock = new OSMPBF::PrimitiveBlock();
+}
+
+void release(){
+    delete(gbuffer);
+    delete(gunpack_buffer);
+    delete(gblobheader);
+    delete(gblob);
+    delete(gheaderblock);
+    delete(gprimblock);
+    google::protobuf::ShutdownProtobufLibrary();
+}
+
 void iterate(int /*argc*/, char *argv[], long long int minblock, long long int maxblock) {
+    char * buffer = gbuffer;
+    char * unpack_buffer = gunpack_buffer;
+    OSMPBF::BlobHeader & blobheader = *gblobheader;
+    OSMPBF::Blob & blob = *gblob;
+    OSMPBF::HeaderBlock & headerblock = *gheaderblock;
+    OSMPBF::PrimitiveBlock & primblock = *gprimblock;
+
     debug("minblock %d, maxblock %d", minblock, maxblock);
     // open specified file
     FILE *fp = fopen(argv[optind], "rb");
