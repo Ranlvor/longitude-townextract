@@ -131,10 +131,9 @@ int main(int argc, char *argv[]) {
     iterate(argc, argv, minWayBlock, maxWayBlock);
     ie.nextPass();
     iterate(argc, argv, minPointBlock, maxPointBlock);
-    ie.finish();
-
     // clean up the protobuf lib
     google::protobuf::ShutdownProtobufLibrary();
+    ie.finish();
 }
 
 void iterate(int /*argc*/, char *argv[], long long int minblock, long long int maxblock) {
