@@ -176,8 +176,9 @@ void InformationExtractor::init(){
 void InformationExtractor::nextPass(){
     pass++;
     info("\n\nSwitching to pass %d", pass);
-    if(pass == 3)
-        interestingWays.clear(); //We do not need this anymore
+    if(pass == 3) {
+        interestingWays = std::unordered_set<long long int> (); //We do not need this anymore
+    }
     db.commitTransaction();
     db.beginTransaction();
 }
@@ -200,7 +201,7 @@ void InformationExtractor::primBlockCallback(OSMPBF::PrimitiveBlock primblock){
 }
 
 void InformationExtractor::finish(){
-    interestingPoints.clear(); //We do not need this anymore
+    interestingPoints = std::unordered_set<long long int> (); //We do not need this anymore
     db.commitTransaction();
     info("\nBuilding boundingbox-index");
     db.buildBoundingboxIndex();
