@@ -2,13 +2,6 @@
 #define LOOKUP_H
 #include "Database.h"
 #include <string>
-/*
-namespace Osmium {
-    namespace OSM {
-        class Relation;
-        class Area;
-    }
-}*/
 
 class Lookup
 {
@@ -24,8 +17,6 @@ private:
     Database db;
     long long int loadedGeometry = -1;
     std::vector<Way> geometry;
-    //Osmium::OSM::Relation * osmBorderRelation = 0;
-    //Osmium::OSM::Area * osmBorderArea = 0;
 
     void loadGeometry(long long int id);
     bool inGeometry(double latitude, double longitude);
