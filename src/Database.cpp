@@ -38,6 +38,9 @@ Database::Database() {
                        "  AND bb.maxlat > ?1 "
                        "  AND bb.minlon < ?2 "
                        "  AND bb.maxlon > ?2 "
+#ifndef DEBUGLOOKUP
+                       "  AND br.adminlevel <= 8 "
+#endif
 
                        "ORDER BY br.adminlevel DESC",
                        -1, &stmtGetPossibleBorderrelations, 0);
