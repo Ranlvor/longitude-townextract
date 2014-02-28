@@ -11,7 +11,7 @@ PROTOC = protoc
 all: bin/importer bin/lookupcli
 
 bin/lookupcli: bin/lookupcli.o bin/Database.o bin/Lookup.o
-	$(LD) $(LDargs) -o bin/lookupcli bin/lookupcli.o bin/Database.o bin/Lookup.o -pthread -lz -lsqlite3 -lgeos -lprotobuf-lite -losmpbf
+	$(LD) $(LDargs) -o bin/lookupcli bin/lookupcli.o bin/Database.o bin/Lookup.o -lsqlite3
 
 bin/importer: bin/importer.o bin/InformationExtractor.o bin/Database.o bin/osmformat.pb.o bin/fileformat.pb.o 
 	$(LD) $(LDargs) -o bin/importer bin/importer.o bin/InformationExtractor.o bin/Database.o bin/osmformat.pb.o bin/fileformat.pb.o -pthread -lz -lprotobuf -lsqlite3
