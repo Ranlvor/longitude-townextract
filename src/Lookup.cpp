@@ -23,7 +23,7 @@ std::string Lookup::lookup(double latitude, double longitude){
         if(inGeometry(latitude, longitude)) {
             Output::debug("  border does match");
 #ifdef DEBUGLOOKUP
-            if(result != "")
+            if(result == "")
 #endif
                 result = canidate.name;
 #ifndef DEBUGLOOKUP
