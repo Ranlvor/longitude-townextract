@@ -1,5 +1,5 @@
 #include "Lookup.h"
-#include "output.h"
+#include "Output.h"
 
 Lookup::Lookup()
 {
@@ -11,17 +11,17 @@ Lookup::~Lookup()
 
 std::string Lookup::lookup(double latitude, double longitude){
 #ifdef DEBUTOUGPUT
-    debug("Lookup::lookup(%f, %f)", latitude, longitude);
+    Output::debug("Lookup::lookup(%f, %f)", latitude, longitude);
 #endif //DEBUTOUTPUT
     std::string result = "";
     std::vector<Borderrelation> canidates = db.getPossibleBorderrelations(latitude, longitude);
     for (std::vector<Borderrelation>::iterator it = canidates.begin() ; it != canidates.end(); ++it) {
         Borderrelation & canidate = *it;
-        debug("  checking border %s (adminlevel %d)", canidate.name.c_str(), canidate.adminlevel);
+        Output::debug("  checking border %s (adminlevel %d)", canidate.name.c_str(), canidate.adminlevel);
         loadGeometry(canidate.relationid);
 
         if(inGeometry(latitude, longitude)) {
-            debug("  border does match");
+            Output::debug("  border does match");
 #ifdef DEBUGLOOKUP
             if(result != "")
 #endif
@@ -31,7 +31,7 @@ std::string Lookup::lookup(double latitude, double longitude){
 #endif
 
         } else
-            debug("  border does *not* match");
+            Output::debug("  border does *not* match");
     }
     return result;
 }
@@ -41,11 +41,11 @@ void Lookup::loadGeometry(long long int id){
     if(loadedGeometry == id)
         return;
 #ifdef DEBUTOUGPUT
-    debug("      loading borderdata %d", id);
+    Output::debug("      loading borderdata %d", id);
 #endif //DEBUTOUTPUT
     geometry = db.getBorderGeometry(id);
 #ifdef DEBUTOUGPUT
-    debug("      border has %d ways", geometry.size());
+    Output::debug("      border has %d ways", geometry.size());
 #endif //DEBUTOUTPUT
 
     loadedGeometry = id;

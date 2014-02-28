@@ -1,5 +1,5 @@
 #include "Database.h"
-#include "output.h"
+#include "Output.h"
 
 Database::Database() {
     sqlite3_open("./db/borderdatabase.db", &db);

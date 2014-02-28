@@ -1,5 +1,5 @@
 #include "InformationExtractor.h"
-#include "output.h"
+#include "Output.h"
 #include "stringToNumber.h"
 #include <string>
 InformationExtractor::InformationExtractor()
@@ -13,7 +13,7 @@ void inline InformationExtractor::primBlockCallbackPass1(OSMPBF::PrimitiveBlock 
         OSMPBF::PrimitiveGroup pg = primblock.primitivegroup(i);
         if(pg.relations_size() > 0) {
 #ifdef DEBUTOUGPUT
-            debug("  Found relations");
+            Output::debug("  Found relations");
 #endif //DEBUTOUTPUT
             unsigned int adminLevelNumber = 0;
             unsigned int administrativeNumber = 0;
@@ -29,47 +29,47 @@ void inline InformationExtractor::primBlockCallbackPass1(OSMPBF::PrimitiveBlock 
                 if(current == "admin_level") {
                     adminLevelNumber = j;
 #ifdef DEBUTOUGPUT
-                    debug("    adminLevel = %d", adminLevelNumber);
+                    Output::debug("    adminLevel = %d", adminLevelNumber);
 #endif //DEBUTOUTPUT
                 } else if (current == "name") {
                     nameNumber = j;
 #ifdef DEBUTOUGPUT
-                    debug("    name = %d", nameNumber);
+                    Output::debug("    name = %d", nameNumber);
 #endif //DEBUTOUTPUT
                 } else if (current == "administrative") {
                     administrativeNumber = j;
 #ifdef DEBUTOUGPUT
-                    debug("    administrative = %d", administrativeNumber);
+                    Output::debug("    administrative = %d", administrativeNumber);
 #endif //DEBUTOUTPUT
                 } else if (current == "boundary") {
                     boundaryNumber = j;
 #ifdef DEBUTOUGPUT
-                    debug("    boundary = %d", boundaryNumber);
+                    Output::debug("    boundary = %d", boundaryNumber);
 #endif //DEBUTOUTPUT
                 } else if (current == "inner") {
                     innerNumber = j;
 #ifdef DEBUTOUGPUT
-                    debug("    inner = %d", innerNumber);
+                    Output::debug("    inner = %d", innerNumber);
 #endif //DEBUTOUTPUT
                 } else if (current == "outer") {
                     outerNumber = j;
 #ifdef DEBUTOUGPUT
-                    debug("    outer = %d", outerNumber);
+                    Output::debug("    outer = %d", outerNumber);
 #endif //DEBUTOUTPUT
                 } else if (current == "enclave") {
                     enclaveNumber = j;
 #ifdef DEBUTOUGPUT
-                    debug("    enclave = %d", enclaveNumber);
+                    Output::debug("    enclave = %d", enclaveNumber);
 #endif //DEBUTOUTPUT
                 } else if (current == "exclave") {
                     exclaveNumber = j;
 #ifdef DEBUTOUGPUT
-                    debug("    exclave = %d", exclaveNumber);
+                    Output::debug("    exclave = %d", exclaveNumber);
 #endif //DEBUTOUTPUT
                 } else if (current == "") {
                     emptyStringNumber = j;
 #ifdef DEBUTOUGPUT
-                    debug("    (empty string) = %d", emptyStringNumber);
+                    Output::debug("    (empty string) = %d", emptyStringNumber);
 #endif //DEBUTOUTPUT
                 }
             }
@@ -103,7 +103,7 @@ void inline InformationExtractor::primBlockCallbackPass1(OSMPBF::PrimitiveBlock 
                         }
                     }
 #ifdef DEBUTOUGPUT
-                    debug("    found border (level %d, id %d) %s", adminlevel, id, name.c_str());
+                    Output::debug("    found border (level %d, id %d) %s", adminlevel, id, name.c_str());
 #endif //DEBUTOUTPUT
                     db.insertBorderRelation(id, name, adminlevel);
 
@@ -119,7 +119,7 @@ void inline InformationExtractor::primBlockCallbackPass1(OSMPBF::PrimitiveBlock 
                                 role = inner;
 
                             if(role == invalid) {
-                                warn("      found way (%d) of unknown role (%s)", memid, stringtable.s(roleStringId).c_str());
+                                Output::warn("      found way (%d) of unknown role (%s)", memid, stringtable.s(roleStringId).c_str());
                             } else {
                                 db.insertRelationWay(id, memid, role);
                                 interestingWays.insert(memid);
@@ -142,7 +142,7 @@ void inline InformationExtractor::primBlockCallbackPass2(OSMPBF::PrimitiveBlock 
                 if(interestingWays.count(wayid) != 0) {
 
 #ifdef DEBUTOUGPUT
-                    debug("  found way %d", wayid);
+                    Output::debug("  found way %d", wayid);
 #endif //DEBUTOUTPUT
 
                     long long int pointid = 0;
@@ -164,7 +164,7 @@ void inline InformationExtractor::primBlockCallbackPass3(OSMPBF::PrimitiveBlock 
     for(int i = 0, l = primblock.primitivegroup_size(); i < l; i++) {
         OSMPBF::PrimitiveGroup pg = primblock.primitivegroup(i);
         if(pg.nodes_size() > 0) {
-            err("has non-dense nodes and non-dense nodes are not implemented");
+            Output::err("has non-dense nodes and non-dense nodes are not implemented");
         }
 
         // tell about dense nodes
@@ -184,7 +184,7 @@ void inline InformationExtractor::primBlockCallbackPass3(OSMPBF::PrimitiveBlock 
                     databaseLon = (lon_offset + ((double)granularity * (double)longitude))/OSMPBF::lonlat_resolution;
                     db.insertPoint(id, databaseLat, databaseLon);
 #ifdef DEBUTOUGPUT
-                    debug("  point: %d, %d (%F), %d (%F)",id, latitude, databaseLat, longitude, databaseLon);
+                    Output::debug("  point: %d, %d (%F), %d (%F)",id, latitude, databaseLat, longitude, databaseLon);
 #endif //DEBUTOUTPUT
                 }
             }
@@ -193,14 +193,14 @@ void inline InformationExtractor::primBlockCallbackPass3(OSMPBF::PrimitiveBlock 
 }
 
 void InformationExtractor::init(){
-    debug("InformationExtractor::init prepare for pass 1");
+    Output::debug("InformationExtractor::init prepare for pass 1");
     pass = 1;
     db.beginTransaction();
 }
 
 void InformationExtractor::nextPass(){
     pass++;
-    info("\n\nSwitching to pass %d", pass);
+    Output::info("\n\nSwitching to pass %d", pass);
     if(pass == 3) {
         interestingWays = std::unordered_set<long long int> (); //We do not need this anymore
     }
@@ -210,7 +210,7 @@ void InformationExtractor::nextPass(){
 
 void InformationExtractor::primBlockCallback(OSMPBF::PrimitiveBlock primblock){
 #ifdef DEBUTOUGPUT
-    debug("InformationExtractor::primBlockCallback");
+    Output::debug("InformationExtractor::primBlockCallback");
 #endif //DEBUTOUTPUT
 
     switch (pass){
@@ -231,6 +231,6 @@ void InformationExtractor::primBlockCallback(OSMPBF::PrimitiveBlock primblock){
 void InformationExtractor::finish(){
     interestingPoints = std::unordered_set<long long int> (); //We do not need this anymore
     db.commitTransaction();
-    info("\nBuilding boundingbox-index");
+    Output::info("\nBuilding boundingbox-index");
     db.buildBoundingboxIndex();
 }
