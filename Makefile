@@ -8,7 +8,7 @@ CCargs = -g -c -Wall -I$(OSMBINARYINC) -std=c++11 -O3
 LDargs = -g -Wall  -std=c++11 -O3
 PROTOC = protoc
 
-all: bin/importer bin/lookupcli
+all: bin/importer bin/lookupcli bin/batchlookup
 
 bin/lookupcli: bin/lookupcli.o bin/Database.o bin/Lookup.o bin/Output.o
 	$(LD) $(LDargs) -o bin/lookupcli bin/lookupcli.o bin/Database.o bin/Lookup.o bin/Output.o -lsqlite3
@@ -16,11 +16,17 @@ bin/lookupcli: bin/lookupcli.o bin/Database.o bin/Lookup.o bin/Output.o
 bin/importer: bin/importer.o bin/InformationExtractor.o bin/Database.o bin/osmformat.pb.o bin/fileformat.pb.o bin/Output.o
 	$(LD) $(LDargs) -o bin/importer bin/importer.o bin/InformationExtractor.o bin/Database.o bin/Output.o bin/osmformat.pb.o bin/fileformat.pb.o -pthread -lz -lprotobuf -lsqlite3
 
+bin/batchlookup: bin/batchlookup.o bin/Database.o bin/Lookup.o bin/Output.o
+	$(LD) $(LDargs) -o bin/batchlookup bin/batchlookup.o bin/Database.o bin/Lookup.o bin/Output.o -lsqlite3
+
 bin/importer.o: src/importer.cpp src/InformationExtractor.h src/Database.h generated/osmformat.pb.cc generated/fileformat.pb.cc src/Output.h
 	$(CC) $(CCargs) -o bin/importer.o src/importer.cpp
 
 bin/lookupcli.o: src/lookupcli.cpp src/Database.h src/Lookup.h src/Output.h
 	$(CC) $(CCargs) -o bin/lookupcli.o src/lookupcli.cpp
+
+bin/batchlookup.o: src/batchlookup.cpp src/Database.h src/Lookup.h src/Output.h
+	$(CC) $(CCargs) -o bin/batchlookup.o src/batchlookup.cpp
 
 bin/Output.o: src/Output.cpp src/Output.h
 	$(CC) $(CCargs) -o bin/Output.o src/Output.cpp
