@@ -1,7 +1,7 @@
 #include "Lookup.h"
 #include "Output.h"
 
-Lookup::Lookup()
+Lookup::Lookup(): db(), gc(db)
 {
 }
 
@@ -43,7 +43,7 @@ void Lookup::loadGeometry(long long int id){
 #ifdef DEBUTOUGPUT
     Output::debug("      loading borderdata %d", id);
 #endif //DEBUTOUTPUT
-    geometry = db.getBorderGeometry(id);
+    geometry = gc.getBorderGeometry(id);
 #ifdef DEBUTOUGPUT
     Output::debug("      border has %d ways", geometry.size());
 #endif //DEBUTOUTPUT

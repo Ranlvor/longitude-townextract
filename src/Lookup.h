@@ -1,6 +1,7 @@
 #ifndef LOOKUP_H
 #define LOOKUP_H
 #include "Database.h"
+#include "GeometryCache.h"
 #include <string>
 
 class Lookup
@@ -15,6 +16,7 @@ public:
 
 private:
     Database db;
+    GeometryCache gc;
     long long int loadedGeometry = -1;
     std::vector<Way> geometry;
 

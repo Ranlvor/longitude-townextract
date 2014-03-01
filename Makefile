@@ -10,26 +10,29 @@ PROTOC = protoc
 
 all: bin/importer bin/lookupcli bin/batchlookup
 
-bin/lookupcli: bin/lookupcli.o bin/Database.o bin/Lookup.o bin/Output.o
-	$(LD) $(LDargs) -o bin/lookupcli bin/lookupcli.o bin/Database.o bin/Lookup.o bin/Output.o -lsqlite3
+bin/lookupcli: bin/lookupcli.o bin/Database.o bin/Lookup.o bin/Output.o bin/GeometryCache.o
+	$(LD) $(LDargs) -o bin/lookupcli bin/lookupcli.o bin/Database.o bin/Lookup.o bin/Output.o bin/GeometryCache.o -lsqlite3
 
 bin/importer: bin/importer.o bin/InformationExtractor.o bin/Database.o bin/osmformat.pb.o bin/fileformat.pb.o bin/Output.o
 	$(LD) $(LDargs) -o bin/importer bin/importer.o bin/InformationExtractor.o bin/Database.o bin/Output.o bin/osmformat.pb.o bin/fileformat.pb.o -pthread -lz -lprotobuf -lsqlite3
 
-bin/batchlookup: bin/batchlookup.o bin/Database.o bin/Lookup.o bin/Output.o
-	$(LD) $(LDargs) -o bin/batchlookup bin/batchlookup.o bin/Database.o bin/Lookup.o bin/Output.o -lsqlite3
+bin/batchlookup: bin/batchlookup.o bin/Database.o bin/Lookup.o bin/Output.o bin/GeometryCache.o
+	$(LD) $(LDargs) -o bin/batchlookup bin/batchlookup.o bin/Database.o bin/Lookup.o bin/Output.o bin/GeometryCache.o -lsqlite3
 
 bin/importer.o: src/importer.cpp src/InformationExtractor.h src/Database.h generated/osmformat.pb.cc generated/fileformat.pb.cc src/Output.h
 	$(CC) $(CCargs) -o bin/importer.o src/importer.cpp
 
-bin/lookupcli.o: src/lookupcli.cpp src/Database.h src/Lookup.h src/Output.h
+bin/lookupcli.o: src/lookupcli.cpp src/Database.h src/Lookup.h src/Output.h src/GeometryCache.h
 	$(CC) $(CCargs) -o bin/lookupcli.o src/lookupcli.cpp
 
-bin/batchlookup.o: src/batchlookup.cpp src/Database.h src/Lookup.h src/Output.h
+bin/batchlookup.o: src/batchlookup.cpp src/Database.h src/Lookup.h src/Output.h src/GeometryCache.h
 	$(CC) $(CCargs) -o bin/batchlookup.o src/batchlookup.cpp
 
 bin/Output.o: src/Output.cpp src/Output.h
 	$(CC) $(CCargs) -o bin/Output.o src/Output.cpp
+
+bin/GeometryCache.o: src/GeometryCache.cpp src/GeometryCache.h
+	$(CC) $(CCargs) -o bin/GeometryCache.o src/GeometryCache.cpp
 
 bin/InformationExtractor.o: src/InformationExtractor.cpp src/InformationExtractor.h src/Database.h generated/osmformat.pb.cc generated/fileformat.pb.cc src/stringToNumber.h src/Output.h
 	$(CC) $(CCargs) -o bin/InformationExtractor.o src/InformationExtractor.cpp
@@ -37,7 +40,7 @@ bin/InformationExtractor.o: src/InformationExtractor.cpp src/InformationExtracto
 bin/Database.o: src/Database.cpp src/Database.h  src/Output.h
 	$(CC) $(CCargs) -o bin/Database.o src/Database.cpp
 
-bin/Lookup.o: src/Lookup.cpp src/Lookup.h src/Database.h src/stringToNumber.h src/Output.h
+bin/Lookup.o: src/Lookup.cpp src/Lookup.h src/Database.h src/stringToNumber.h src/Output.h src/GeometryCache.h
 	$(CC) $(CCargs) -o bin/Lookup.o src/Lookup.cpp
 
 generated/osmformat.pb.cc: $(OSMBINARYSRC)/osmformat.proto
