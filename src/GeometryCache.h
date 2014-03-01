@@ -10,11 +10,15 @@ public:
     std::vector<Way> getBorderGeometry(long long int borderid);
 
 private:
+#ifndef INFINITECACHE
     void shrinkCache();
     void refresh(long long int borderid);
     static const unsigned int CACHESIZE = 10;
+#endif
     Database & db;
+#ifndef INFINITECACHE
     std::list<long long int> deletequeue;
+#endif
     std::unordered_map<long long int, std::vector<Way>> geometrys;
 };
 
