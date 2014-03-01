@@ -200,7 +200,9 @@ void InformationExtractor::init(){
 
 void InformationExtractor::nextPass(){
     pass++;
-    Output::info("\n\nSwitching to pass %d", pass);
+    Output::info("");
+    Output::info("");
+    Output::info("Switching to pass %d", pass);
     if(pass == 3) {
         interestingWays = std::unordered_set<long long int> (); //We do not need this anymore
     }
@@ -232,6 +234,7 @@ void InformationExtractor::finish(){
     interestingPoints = std::unordered_set<long long int> (); //We do not need this anymore
     db.commitTransaction();
     db.minimizeMemoryUssage();
-    Output::info("\nBuilding boundingbox-index");
+    Output::info("");
+    Output::info("Building boundingbox-index");
     db.buildBoundingboxIndex();
 }

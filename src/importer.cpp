@@ -144,7 +144,8 @@ void iterate(int /*argc*/, char *argv[], long long int minblock, long long int m
 
 #ifdef DEBUTOUGPUT
         // tell about the blob-header
-        Output::info("\n  BlobHeader (%d bytes)", sz);
+        Output::info("");
+        Output::info("  BlobHeader (%d bytes)", sz);
         Output::debug("    type = %s", blobheader.type().c_str());
 #endif //DEBUTOUTPUT
 

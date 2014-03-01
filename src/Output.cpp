@@ -6,15 +6,23 @@
 #include <stdio.h>
 //contains exit()
 #include <cstdlib>
-
+#include <time.h>       /* time_t, time, ctime */
 
 bool Output::usecolor = false;
 
 // prints a formatted message to stdout, optionally color coded
 void Output::msg(const char* format, int color, va_list args) {
+    time_t rawtime;
+    time (&rawtime);
+
+    char timestring[9];
+    strftime (timestring, 9, "%H:%M:%S", localtime(&rawtime) );
+    printf ("%s: ", timestring);
+
     if(usecolor) {
         fprintf(stdout, "\x1b[0;%dm", color);
     }
+
     vfprintf(stdout, format, args);
     if(usecolor) {
         fprintf(stdout, "\x1b[0m\n");
