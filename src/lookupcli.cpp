@@ -1,21 +1,11 @@
 // getopt is used to check for the --color-flag
 #include <getopt.h>
-// needed for isatty (dafuq?)
-#include <zlib.h>
 
 #include "Lookup.h"
 #include "stringToNumber.h"
 #include "Output.h"
 
 int main(int argc, char *argv[]) {
-    // check if the output is a tty so we can use colors
-
-#ifdef WIN32
-    Output::usecolor = 0;
-#else
-    Output::usecolor = isatty(1);
-#endif
-
     static struct option long_options[] = {
         {"color",                no_argument, 0, 'c'},
         {0,0,0,0}

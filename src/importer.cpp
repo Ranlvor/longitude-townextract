@@ -42,14 +42,6 @@ void allocate();
 void iterate(int, char *argv[], long long minblock, long long maxblock);
 // application main method
 int main(int argc, char *argv[]) {
-    // check if the output is a tty so we can use colors
-
-#ifdef WIN32
-    Output::usecolor = 0;
-#else
-    Output::usecolor = isatty(1);
-#endif
-
     static struct option long_options[] = {
         {"color",                no_argument, 0, 'c'},
         {0,0,0,0}

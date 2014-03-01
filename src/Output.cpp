@@ -7,8 +7,16 @@
 //contains exit()
 #include <cstdlib>
 #include <time.h>       /* time_t, time, ctime */
+// needed for isatty (dafuq?)
+#include <zlib.h>
 
+#ifdef WIN32
 bool Output::usecolor = false;
+#else
+bool Output::usecolor = isatty(1);
+#endif
+
+
 
 // prints a formatted message to stdout, optionally color coded
 void Output::msg(const char* format, int color, va_list args) {
