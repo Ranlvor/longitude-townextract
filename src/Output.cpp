@@ -17,17 +17,17 @@ void Output::msg(const char* format, int color, va_list args) {
 
     char timestring[9];
     strftime (timestring, 9, "%H:%M:%S", localtime(&rawtime) );
-    printf ("%s: ", timestring);
+    fprintf(stderr, "%s: ", timestring);
 
     if(usecolor) {
-        fprintf(stdout, "\x1b[0;%dm", color);
+        fprintf(stderr, "\x1b[0;%dm", color);
     }
 
-    vfprintf(stdout, format, args);
+    vfprintf(stderr, format, args);
     if(usecolor) {
-        fprintf(stdout, "\x1b[0m\n");
+        fprintf(stderr, "\x1b[0m\n");
     } else {
-        fprintf(stdout, "\n");
+        fprintf(stderr, "\n");
     }
 }
 

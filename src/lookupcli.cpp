@@ -48,4 +48,5 @@ int main(int argc, char *argv[]) {
     Lookup l;
     std::string result = l.lookup(StringToNumber<double>(latitude), StringToNumber<double>(longitude));
     Output::info("Match: %s", result.c_str());
+    fprintf(stdout, "%s\n", result.c_str());
 }
