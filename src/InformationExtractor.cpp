@@ -231,6 +231,7 @@ void InformationExtractor::primBlockCallback(OSMPBF::PrimitiveBlock primblock){
 void InformationExtractor::finish(){
     interestingPoints = std::unordered_set<long long int> (); //We do not need this anymore
     db.commitTransaction();
+    db.minimizeMemoryUssage();
     Output::info("\nBuilding boundingbox-index");
     db.buildBoundingboxIndex();
 }

@@ -40,8 +40,9 @@ public:
     void buildBoundingboxIndex();
 
     std::vector<Borderrelation> getPossibleBorderrelations(double lat, double lon);
-
     std::vector<Way> getBorderGeometry(long long int borderid);
+
+    void minimizeMemoryUssage();
 
 private:
     sqlite3 *db;
@@ -53,6 +54,9 @@ private:
     sqlite3_stmt *stmtInsertPoint;
     sqlite3_stmt *stmtGetPossibleBorderrelations;
     sqlite3_stmt *stmtGetBorderGeometry;
+
+    void openDatabase();
+    void closeDatabase();
 };
 
 #endif // DATABASE_H

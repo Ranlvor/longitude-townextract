@@ -1,7 +1,12 @@
+#include <malloc.h>
 #include "Database.h"
 #include "Output.h"
 
 Database::Database() {
+    openDatabase();
+}
+
+void Database::openDatabase(){
     sqlite3_open("./db/borderdatabase.db", &db);
 
     sqlite3_stmt *stmttmp;
@@ -59,7 +64,7 @@ Database::Database() {
                        -1, &stmtGetBorderGeometry, 0);
 }
 
-Database::~Database() {
+void Database::closeDatabase(){
     sqlite3_finalize(stmtBeginTransaction);
     sqlite3_finalize(stmtCommitTransaction);
     sqlite3_finalize(stmtInsertBorderRelation);
@@ -69,6 +74,10 @@ Database::~Database() {
     sqlite3_finalize(stmtGetPossibleBorderrelations);
     sqlite3_finalize(stmtGetBorderGeometry);
     sqlite3_close_v2(db);
+}
+
+Database::~Database() {
+    closeDatabase();
 }
 
 void Database::beginTransaction() {
@@ -177,4 +186,10 @@ std::vector<Way> Database::getBorderGeometry(long long int borderid){
 
     sqlite3_reset(stmtGetBorderGeometry);
     return geometry;
+}
+
+void Database::minimizeMemoryUssage(){
+    closeDatabase();
+    malloc_trim(0); //Necessary to make sure the memory is realy released to the OS.
+    openDatabase();
 }
