@@ -31,7 +31,9 @@ int main() {
     std::vector<std::string> fields;
     Lookup l;
     for (std::string line; std::getline(std::cin, line);) {
+        #ifdef DEBUTOUGPUT
         Output::debug("line: %s", line.c_str());
+        #endif //DEBUTOUTPUT
         split( fields, line, ',' );
         if(fields.size() != 3) {
             Output::warn("invalid number of arguments on line '%s'", line.c_str());
@@ -40,7 +42,9 @@ int main() {
         std::string id = fields.at(0);
         double latitude = StringToNumber<double>(fields.at(1));
         double longitude = StringToNumber<double>(fields.at(2));
+        #ifdef DEBUTOUGPUT
         Output::debug("id: %s, latitude: %f, lontidue: %f", id.c_str(), latitude, longitude);
+        #endif //DEBUTOUTPUT
         std::string result = l.lookup(latitude, longitude);
         fprintf(stdout, "%s,%s\n", id.c_str(), result.c_str());
     }

@@ -17,12 +17,15 @@ std::string Lookup::lookup(double latitude, double longitude){
     std::vector<Borderrelation> canidates = db.getPossibleBorderrelations(latitude, longitude);
     for (std::vector<Borderrelation>::iterator it = canidates.begin() ; it != canidates.end(); ++it) {
         Borderrelation & canidate = *it;
+        #ifdef DEBUTOUGPUT
         Output::debug("  checking border %s (adminlevel %d)", canidate.name.c_str(), canidate.adminlevel);
+        #endif //DEBUTOUTPUT
+
         loadGeometry(canidate.relationid);
 
         if(inGeometry(latitude, longitude)) {
+#ifdef DEBUTOUGPUT
             Output::debug("  border does match");
-#ifdef DEBUGLOOKUP
             if(result == "")
 #endif
                 result = canidate.name;
@@ -30,8 +33,11 @@ std::string Lookup::lookup(double latitude, double longitude){
             return result;
 #endif
 
-        } else
+        } else {
+            #ifdef DEBUTOUGPUT
             Output::debug("  border does *not* match");
+            #endif
+        }
     }
     return result;
 }
