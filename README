@@ -1,0 +1,21 @@
+Do you want to know in which villages some coordinates are but you do not want to run a geocoder requiring a postgis-server using over 100GB of harddrive-space and much memory? Well, this was my problem when I stared with this project.
+
+This project extracts all borders from the planetdump suplied and puts it into an sqlite-database allowing lookups. Importing europe (a 12 GB .pbf-file) took less than 90 minutes, less than 2GB of free RAM and and created a database smaller than 3GB.
+
+Compile with make -j 6.
+
+//TODO: list dependences here. It's not done yet, but gcc will let you know what's missing (in a very cryptik way, so send me a message if it's a problem, I'm only to lazy to do the list because I don't think anybody would use this)
+
+Generated binarys:
+./bin/importer:
+  Used to import the .pbf-Planetdump. Ussage: ./bin/importer <path to planetdump>
+  This programm can require some RAM for the protobuf-Objects and for the temporary lists of objects we are interested in.
+
+./bin/lookupcli:
+  Used to look up one pair of coordinates. Ussage: ./bin/lookupcli <latitude> <longitude>
+
+./bin/batchlookup:
+  Used to lookup mane pairs of coordinates. Ussage: ./bin/batchlookup
+  Then supply lines with identifier, latitude, longitde to stdin
+  The results will be written to stdout as id, relationid, bordername //TODO: relationid is not implemented yet!
+  This programm is much faster than lookupcli if you have more than one point because up to 10 borders are cached in RAM without querying the database. Loading all points of a border from the database, even from the database-cache, is the slowest part of the whole lookup.
