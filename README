@@ -2,9 +2,13 @@ Do you want to know in which villages some coordinates are but you do not want t
 
 This project extracts all borders from the planetdump suplied and puts it into an sqlite-database allowing lookups. Importing europe (a 12 GB .pbf-file) took less than 90 minutes, less than 2GB of free RAM and and created a database smaller than 3GB.
 
+After clone run git submodule update --init to load openstreetmap-protobuf-definitions.
+
 Compile with make -j 6.
 
-//TODO: list dependences here. It's not done yet, but gcc will let you know what's missing (in a very cryptik way, so send me a message if it's a problem, I'm only to lazy to do the list because I don't think anybody would use this)
+Dependences (possibly incompleate)
+ - libsqlite3
+ - libprotobuf
 
 Generated binarys:
 ./bin/importer:
