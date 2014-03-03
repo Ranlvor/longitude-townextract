@@ -103,7 +103,7 @@ void inline InformationExtractor::primBlockCallbackPass1(OSMPBF::PrimitiveBlock 
                         }
                     }
 #ifdef DEBUTOUGPUT
-                    Output::debug("    found border (level %d, id %d) %s", adminlevel, id, name.c_str());
+                    Output::debug("    found border (level %d, id %lld) %s", adminlevel, id, name.c_str());
 #endif //DEBUTOUTPUT
                     db.insertBorderRelation(id, name, adminlevel);
 
@@ -119,7 +119,7 @@ void inline InformationExtractor::primBlockCallbackPass1(OSMPBF::PrimitiveBlock 
                                 role = inner;
 
                             if(role == invalid) {
-                                Output::warn("      found way (%d) of unknown role (%s)", memid, stringtable.s(roleStringId).c_str());
+                                Output::warn("      found way (%lld) of unknown role (%s)", memid, stringtable.s(roleStringId).c_str());
                             } else {
                                 db.insertRelationWay(id, memid, role);
                                 interestingWays.insert(memid);
@@ -142,7 +142,7 @@ void inline InformationExtractor::primBlockCallbackPass2(OSMPBF::PrimitiveBlock 
                 if(interestingWays.count(wayid) != 0) {
 
 #ifdef DEBUTOUGPUT
-                    Output::debug("  found way %d", wayid);
+                    Output::debug("  found way %lld", wayid);
 #endif //DEBUTOUTPUT
 
                     long long int pointid = 0;
@@ -184,7 +184,7 @@ void inline InformationExtractor::primBlockCallbackPass3(OSMPBF::PrimitiveBlock 
                     databaseLon = (lon_offset + ((double)granularity * (double)longitude))/OSMPBF::lonlat_resolution;
                     db.insertPoint(id, databaseLat, databaseLon);
 #ifdef DEBUTOUGPUT
-                    Output::debug("  point: %d, %d (%F), %d (%F)",id, latitude, databaseLat, longitude, databaseLon);
+                    Output::debug("  point: %lld, %d (%F), %d (%F)",id, latitude, databaseLat, longitude, databaseLon);
 #endif //DEBUTOUTPUT
                 }
             }

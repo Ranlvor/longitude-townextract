@@ -104,7 +104,7 @@ void iterate(int /*argc*/, char *argv[], long long int minblock, long long int m
     OSMPBF::HeaderBlock & headerblock = *gheaderblock;
     OSMPBF::PrimitiveBlock & primblock = *gprimblock;
 
-    Output::debug("minblock %d, maxblock %d", minblock, maxblock);
+    Output::debug("minblock %lld, maxblock %lld", minblock, maxblock);
     // open specified file
     FILE *fp = fopen(argv[optind], "rb");
     fseek(fp, minblock, SEEK_SET);
