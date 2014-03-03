@@ -9,6 +9,7 @@ Compile with make -j 6.
 Dependences (possibly incompleate)
  - libsqlite3
  - libprotobuf
+ - protobuf-compiler
 
 Generated binarys:
 ./bin/importer:
