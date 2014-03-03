@@ -11,13 +11,14 @@ public:
     ~Lookup();
 
     std::string lookup(double latitude, double longitude);
-
+    long long int getLastMatchBorderid() { return lastMatch; }
 
 
 private:
     Database db;
     GeometryCache gc;
     long long int loadedGeometry = -1;
+    long long int lastMatch = -1;
     std::vector<Way> geometry;
 
     void loadGeometry(long long int id);

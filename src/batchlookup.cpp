@@ -46,7 +46,7 @@ int main() {
         Output::debug("id: %s, latitude: %f, lontidue: %f", id.c_str(), latitude, longitude);
         #endif //DEBUTOUTPUT
         std::string result = l.lookup(latitude, longitude);
-        fprintf(stdout, "%s,%s\n", id.c_str(), result.c_str());
+        fprintf(stdout, "%s,%lld,%s\n", id.c_str(), l.getLastMatchBorderid(), result.c_str());
     }
     return 0;
 }

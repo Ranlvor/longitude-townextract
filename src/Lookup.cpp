@@ -14,6 +14,7 @@ std::string Lookup::lookup(double latitude, double longitude){
     Output::debug("Lookup::lookup(%f, %f)", latitude, longitude);
 #endif //DEBUTOUTPUT
     std::string result = "";
+    lastMatch = -1;
     std::vector<Borderrelation> canidates = db.getPossibleBorderrelations(latitude, longitude);
     for (std::vector<Borderrelation>::iterator it = canidates.begin() ; it != canidates.end(); ++it) {
         Borderrelation & canidate = *it;
@@ -26,13 +27,15 @@ std::string Lookup::lookup(double latitude, double longitude){
         if(inGeometry(latitude, longitude)) {
 #ifdef DEBUTOUGPUT
             Output::debug("  border does match");
-            if(result == "")
+            if(result == "") {
 #endif
                 result = canidate.name;
-#ifndef DEBUGLOOKUP
+                lastMatch = canidate.relationid;
+#ifdef DEBUTOUGPUT
+            }
+#else
             return result;
 #endif
-
         } else {
             #ifdef DEBUTOUGPUT
             Output::debug("  border does *not* match");
