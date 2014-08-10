@@ -28,7 +28,7 @@ int main(int argc, char *argv[]) {
 
     // check for proper command line args
     if(optind != argc-2)
-        Output::err("usage: %s [--color] latitude longitude", argv[0]);
+        Output::err("usage: %s [--color] [--] latitude longitude", argv[0]);
 
     const char* latitude = argv[optind];
     const char* longitude = argv[optind+1];
