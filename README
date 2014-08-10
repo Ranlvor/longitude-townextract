@@ -13,14 +13,14 @@ Dependences (possibly incompleate)
 
 Generated binarys:
 ./bin/importer:
-  Used to import the .pbf-Planetdump. Ussage: ./bin/importer <path to planetdump>
+  Used to import the .pbf-Planetdump. Usage: ./bin/importer <path to planetdump>
   This programm can require some RAM for the protobuf-Objects and for the temporary lists of objects we are interested in.
 
 ./bin/lookupcli:
-  Used to look up one pair of coordinates. Ussage: ./bin/lookupcli <latitude> <longitude>
+  Used to look up one pair of coordinates. Usage: ./bin/lookupcli <latitude> <longitude>
 
 ./bin/batchlookup:
-  Used to lookup mane pairs of coordinates. Ussage: ./bin/batchlookup
+  Used to lookup mane pairs of coordinates. Usage: ./bin/batchlookup
   Then supply lines with identifier, latitude, longitde to stdin
   The results will be written to stdout as id, relationid, bordername //TODO: relationid is not implemented yet!
   This programm is much faster than lookupcli if you have more than one point because up to 10 borders are cached in RAM without querying the database. Loading all points of a border from the database, even from the database-cache, is the slowest part of the whole lookup.
