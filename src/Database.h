@@ -57,6 +57,8 @@ private:
 
     void openDatabase();
     void closeDatabase();
+    void initialiseDBTables();
+    void executeByCString(const char* query);
 };
 
 #endif // DATABASE_H

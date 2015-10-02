@@ -16,6 +16,9 @@ void Database::openDatabase(){
 
     sqlite3_prepare_v2(db, "BEGIN TRANSACTION;", -1, &stmtBeginTransaction, 0);
     sqlite3_prepare_v2(db, "COMMIT;", -1, &stmtCommitTransaction, 0);
+    
+    initialiseDBTables();
+    
     sqlite3_prepare_v2(db,
                        "INSERT OR REPLACE INTO borderrelations (relationid, name, adminlevel)"
                        "VALUES (?1, ?2, ?3)",
@@ -135,18 +138,13 @@ void Database::insertPoint(long long int pointid, double lat, double lon) {
 
 void Database::buildBoundingboxIndex() {
 #ifndef RODB
-    sqlite3_stmt *stmttmp;
-    sqlite3_prepare_v2(db,
-                       "INSERT INTO boundingboxes "
+    executeByCString(  "INSERT INTO boundingboxes "
                        "SELECT rw.relation, MIN(p.lat) as minlat, MAX(p.lat) as maxlat, MIN(p.lon) as minlon, MAX(p.lon) as maxlon "
 
                        "FROM relationway as rw "
                        " LEFT JOIN waypoint as wp ON (rw.way = wp.way) "
                        " LEFT JOIN point as p ON (wp.point = p.id) "
-                       "GROUP BY rw.relation; ",
-                       -1, &stmttmp, 0);
-    sqlite3_step(stmttmp);
-    sqlite3_finalize(stmttmp);
+                       "GROUP BY rw.relation; ");
 #endif
 }
 
@@ -202,4 +200,48 @@ void Database::minimizeMemoryUssage(){
     closeDatabase();
     malloc_trim(0); //Necessary to make sure the memory is realy released to the OS.
     openDatabase();
+}
+
+void Database::initialiseDBTables() {
+#ifndef RODB
+    void beginTransaction();
+    Database::executeByCString("CREATE TABLE IF NOT EXISTS borderrelations ( "
+                               "relationid INTEGER PRIMARY KEY, "
+                               "    name TEXT, "
+                               "    adminlevel INTEGER "
+                               ");");
+    Database::executeByCString("CREATE TABLE IF NOT EXISTS relationway ( "
+                               "    relation INTEGER, "
+                               "    way INTEGER, "
+                               "    type INTEGER "
+                               ");");
+    Database::executeByCString("CREATE TABLE IF NOT EXISTS waypoint ( "
+                               "    way INTEGER, "
+                               "    'order' INTEGER, "
+                               "    point INTEGER "
+                               ");");
+    Database::executeByCString("CREATE TABLE IF NOT EXISTS point ( "
+                               "    id INTEGER PRIMARY KEY, "
+                               "    lat REAL, "
+                               "    lon REAL "
+                               ");");
+    Database::executeByCString("CREATE VIRTUAL TABLE IF NOT EXISTS boundingboxes USING rtree ( "
+                               "    relationid INTEGER PRIMARY KEY, "
+                               "    minlat REAL, "
+                               "    maxlat REAL, "
+                               "    minlon REAL, "
+                               "    maxlon REAL "
+                               ");");
+    Database::executeByCString("CREATE UNIQUE INDEX IF NOT EXISTS relationwayunique on relationway (relation ASC, way ASC);");
+    Database::executeByCString("CREATE UNIQUE INDEX IF NOT EXISTS waypoingunique on waypoint (way ASC, 'order' ASC, point ASC);");
+
+    void commitTransaction();
+#endif
+}
+
+void Database::executeByCString(const char* query){
+    sqlite3_stmt *stmttmp;
+    sqlite3_prepare_v2(db, query, -1, &stmttmp, 0);
+    sqlite3_step(stmttmp);
+    sqlite3_finalize(stmttmp);
 }
