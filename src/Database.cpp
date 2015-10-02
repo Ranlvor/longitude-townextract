@@ -92,40 +92,49 @@ void Database::commitTransaction() {
 
 void Database::insertBorderRelation(long long int relationid, const std::string & name, int adminlevel) {
     //debug("Database::insertBorderRelation(%d, %s, %d", relationid, name.c_str(), adminlevel);
+#ifndef RODB
     sqlite3_bind_int64(stmtInsertBorderRelation, 1, relationid);
     sqlite3_bind_text(stmtInsertBorderRelation, 2, name.c_str(), -1, SQLITE_TRANSIENT);
     sqlite3_bind_int(stmtInsertBorderRelation, 3, adminlevel);
     sqlite3_step(stmtInsertBorderRelation);
     sqlite3_reset(stmtInsertBorderRelation);
+#endif
 }
 
 //type: 0 = inner, 1 = outer
 void Database::insertRelationWay(long long int relationid, long long int wayid, WayType type) {
+#ifndef RODB
     sqlite3_bind_int64(stmtInsertRelationWay, 1, relationid);
     sqlite3_bind_int64(stmtInsertRelationWay, 2, wayid);
     sqlite3_bind_int(stmtInsertRelationWay, 3, type);
     sqlite3_step(stmtInsertRelationWay);
     sqlite3_reset(stmtInsertRelationWay);
+#endif
 }
 
 
 void Database::insertWayPoint(long long int wayid, long long int pointid, int order) {
+#ifndef RODB
     sqlite3_bind_int64(stmtInsertWayPoint, 1, wayid);
     sqlite3_bind_int64(stmtInsertWayPoint, 2, pointid);
     sqlite3_bind_int(stmtInsertWayPoint, 3, order);
     sqlite3_step(stmtInsertWayPoint);
     sqlite3_reset(stmtInsertWayPoint);
+#endif
 }
 
 void Database::insertPoint(long long int pointid, double lat, double lon) {
+#ifndef RODB
     sqlite3_bind_int64(stmtInsertPoint, 1, pointid);
     sqlite3_bind_double(stmtInsertPoint, 2, lat);
     sqlite3_bind_double(stmtInsertPoint, 3, lon);
     sqlite3_step(stmtInsertPoint);
     sqlite3_reset(stmtInsertPoint);
+#endif
 }
 
 void Database::buildBoundingboxIndex() {
+#ifndef RODB
     sqlite3_stmt *stmttmp;
     sqlite3_prepare_v2(db,
                        "INSERT INTO boundingboxes "
@@ -138,6 +147,7 @@ void Database::buildBoundingboxIndex() {
                        -1, &stmttmp, 0);
     sqlite3_step(stmttmp);
     sqlite3_finalize(stmttmp);
+#endif
 }
 
 
