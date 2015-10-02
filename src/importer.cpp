@@ -330,7 +330,7 @@ void iterate(int /*argc*/, char *argv[], long long int minblock, long long int m
             // iterate over all PrimitiveGroups
             for(int i = 0, l = primblock.primitivegroup_size(); i < l; i++) {
                 // one PrimitiveGroup from the the Block
-                OSMPBF::PrimitiveGroup pg = primblock.primitivegroup(i);
+                const OSMPBF::PrimitiveGroup& pg = primblock.primitivegroup(i);
 
                 bool found_items=false;
 

@@ -6,11 +6,11 @@ InformationExtractor::InformationExtractor()
 {
 }
 
-void inline InformationExtractor::primBlockCallbackPass1(OSMPBF::PrimitiveBlock primblock){
-    OSMPBF::StringTable stringtable = primblock.stringtable();
+void inline InformationExtractor::primBlockCallbackPass1(const OSMPBF::PrimitiveBlock& primblock){
+    const OSMPBF::StringTable& stringtable = primblock.stringtable();
     for(int i = 0, l = primblock.primitivegroup_size(); i < l; i++) {
         // one PrimitiveGroup from the the Block
-        OSMPBF::PrimitiveGroup pg = primblock.primitivegroup(i);
+        const OSMPBF::PrimitiveGroup& pg = primblock.primitivegroup(i);
         if(pg.relations_size() > 0) {
 #ifdef DEBUTOUGPUT
             Output::debug("  Found relations");
@@ -78,7 +78,7 @@ void inline InformationExtractor::primBlockCallbackPass1(OSMPBF::PrimitiveBlock 
                 return; //if adminlevel is not found in the stringtable, it's impossible for a border to apear in this block
 
             for(int j = 0, m = pg.relations_size(); j < m; j++) {
-                OSMPBF::Relation r = pg.relations(j);
+                const OSMPBF::Relation& r = pg.relations(j);
                 bool hasAdminLevel = false;
                 bool hasBoundaryAdministrative = false;
 
@@ -132,12 +132,12 @@ void inline InformationExtractor::primBlockCallbackPass1(OSMPBF::PrimitiveBlock 
     }
 }
 
-void inline InformationExtractor::primBlockCallbackPass2(OSMPBF::PrimitiveBlock primblock){
+void inline InformationExtractor::primBlockCallbackPass2(const OSMPBF::PrimitiveBlock& primblock){
     for(int i = 0, l = primblock.primitivegroup_size(); i < l; i++) {
-        OSMPBF::PrimitiveGroup pg = primblock.primitivegroup(i);
+        const OSMPBF::PrimitiveGroup& pg = primblock.primitivegroup(i);
         if(pg.ways_size() > 0) {
             for(int j = 0, l = pg.ways_size(); j < l; j++) {
-                OSMPBF::Way way = pg.ways(j);
+                const OSMPBF::Way& way = pg.ways(j);
                 long long int wayid = way.id();
                 if(interestingWays.count(wayid) != 0) {
 
@@ -157,19 +157,19 @@ void inline InformationExtractor::primBlockCallbackPass2(OSMPBF::PrimitiveBlock 
     }
 }
 
-void inline InformationExtractor::primBlockCallbackPass3(OSMPBF::PrimitiveBlock primblock){
+void inline InformationExtractor::primBlockCallbackPass3(const OSMPBF::PrimitiveBlock& primblock){
     long long int lat_offset = primblock.lat_offset();
     long long int lon_offset = primblock.lon_offset();
     int granularity = primblock.granularity();
     for(int i = 0, l = primblock.primitivegroup_size(); i < l; i++) {
-        OSMPBF::PrimitiveGroup pg = primblock.primitivegroup(i);
+        const OSMPBF::PrimitiveGroup& pg = primblock.primitivegroup(i);
         if(pg.nodes_size() > 0) {
             Output::err("has non-dense nodes and non-dense nodes are not implemented");
         }
 
         // tell about dense nodes
         if(pg.has_dense()) {
-            OSMPBF::DenseNodes nodes = pg.dense();
+            const OSMPBF::DenseNodes& nodes = pg.dense();
             long long int id = 0;
             long long int latitude = 0;
             long long int longitude = 0;
@@ -210,7 +210,7 @@ void InformationExtractor::nextPass(){
     db.beginTransaction();
 }
 
-void InformationExtractor::primBlockCallback(OSMPBF::PrimitiveBlock primblock){
+void InformationExtractor::primBlockCallback(const OSMPBF::PrimitiveBlock& primblock){
 #ifdef DEBUTOUGPUT
     Output::debug("InformationExtractor::primBlockCallback");
 #endif //DEBUTOUTPUT

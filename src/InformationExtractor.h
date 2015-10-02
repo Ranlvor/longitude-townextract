@@ -9,7 +9,7 @@ public:
     InformationExtractor();
 
     void init();
-    void primBlockCallback(OSMPBF::PrimitiveBlock primblock);
+    void primBlockCallback(const OSMPBF::PrimitiveBlock& primblock);
     void nextPass();
     void finish();
 
@@ -18,9 +18,9 @@ private:
     Database db;
     std::unordered_set<long long int> interestingWays;
     std::unordered_set<long long int> interestingPoints;
-    void primBlockCallbackPass1(OSMPBF::PrimitiveBlock primblock);
-    void primBlockCallbackPass2(OSMPBF::PrimitiveBlock primblock);
-    void primBlockCallbackPass3(OSMPBF::PrimitiveBlock primblock);
+    void primBlockCallbackPass1(const OSMPBF::PrimitiveBlock& primblock);
+    void primBlockCallbackPass2(const OSMPBF::PrimitiveBlock& primblock);
+    void primBlockCallbackPass3(const OSMPBF::PrimitiveBlock& primblock);
 };
 
 #endif // INFORMATIONEXTRACTOR_H
